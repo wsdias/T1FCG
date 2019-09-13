@@ -15,6 +15,8 @@
 //
 
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <cmath>
 #include <ctime>
 
@@ -83,8 +85,8 @@ void animate()
 // **********************************************************************
 void init(void)
 {
-	// Define a cor do fundo da tela (AZUL)
-    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	// Define a cor do fundo da tela (BRANCO)
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 }
 
@@ -107,6 +109,59 @@ void reshape( int w, int h )
     glOrtho(0,10,0,10,0,1);
 }
 
+void DesenhaBaseGuindaste()
+{
+    int i, j, cor, nCores, linhas, colunas;
+    ifstream baseGuindaste;
+    string conteudo;
+
+    baseGuindaste.open("gameObjects/baseGuindaste.txt");
+    baseGuindaste >> conteudo;
+    baseGuindaste >> nCores;
+    float cores[nCores][3];
+
+    for (i = 0; i < nCores; i++)
+    {
+        baseGuindaste >> conteudo;
+        for (j = 0; j < 3; j++) baseGuindaste >> cores[i][j];
+    }
+
+    baseGuindaste >> conteudo;
+    baseGuindaste >> linhas;
+    baseGuindaste >> colunas;
+
+
+    for (i = linhas; i > 0; i--)
+    {
+        for (j = colunas; j > 0; j--)
+        {
+            baseGuindaste >> cor;
+            cor--;
+            //cout << cor << " ";
+            glColor3f(cores[cor][0],cores[cor][1],cores[cor][2]);
+            //cout << cor << " --> " << cores[cor][0] << " " << cores[cor][1] << " " << cores[cor][2] << " : ";
+            glPushMatrix();
+            glBegin(GL_QUADS);
+                glVertex2f(j-1,i);
+                glVertex2f(j,i);
+                glVertex2f(j,i-1);
+                glVertex2f(j-1,i-1);
+            glEnd();
+            glPopMatrix();
+            //cout << "(" << i << ", " << j << ") ";
+        }
+        //cout << endl;
+    }
+    baseGuindaste.close();
+}
+
+void DesenhaGuindaste()
+{
+    glPushMatrix();
+        DesenhaBaseGuindaste();
+    glPopMatrix();
+}
+
 // **********************************************************************
 //  void display( void )
 //
@@ -120,13 +175,13 @@ void display( void )
     // Define os limites lógicos da área OpenGL dentro da Janela
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho(0,10,0,10,0,1);
+    glOrtho(0,80,0,60,0,1);
 
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	// Coloque aqui as chamadas das rotinas que desenha os objetos
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	glLineWidth(3);
+	/*glLineWidth(3);
 	glColor3f(1,0,0);
 
 	glBegin(GL_LINES);
@@ -139,7 +194,11 @@ void display( void )
 	glBegin(GL_LINES);
 	  glVertex2f(5,5);
 	  glVertex2f(10,0);
-	glEnd();
+	glEnd();*/
+
+	glPushMatrix();
+        DesenhaGuindaste();
+	glPopMatrix();
 
 	glutSwapBuffers();
 }
