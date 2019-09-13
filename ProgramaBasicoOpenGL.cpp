@@ -22,6 +22,8 @@
 
 using namespace std;
 
+int larguraLogica = 80, alturaLogica = 60;
+
 #ifdef WIN32
 #include <windows.h>
 #include <glut.h>
@@ -109,13 +111,13 @@ void reshape( int w, int h )
     glOrtho(0,10,0,10,0,1);
 }
 
-void DesenhaBaseGuindaste()
+void DesenhaNivelGuindaste(string diretorio, int dx, int dy)
 {
     int i, j, cor, nCores, linhas, colunas;
     ifstream baseGuindaste;
     string conteudo;
 
-    baseGuindaste.open("gameObjects/baseGuindaste.txt");
+    baseGuindaste.open(diretorio);
     baseGuindaste >> conteudo;
     baseGuindaste >> nCores;
     float cores[nCores][3];
@@ -138,9 +140,10 @@ void DesenhaBaseGuindaste()
             baseGuindaste >> cor;
             cor--;
             //cout << cor << " ";
-            glColor3f(cores[cor][0],cores[cor][1],cores[cor][2]);
             //cout << cor << " --> " << cores[cor][0] << " " << cores[cor][1] << " " << cores[cor][2] << " : ";
             glPushMatrix();
+            glColor3f(cores[cor][0],cores[cor][1],cores[cor][2]);
+            glTranslatef(dx,dy,0);
             glBegin(GL_QUADS);
                 glVertex2f(j-1,i);
                 glVertex2f(j,i);
@@ -157,8 +160,25 @@ void DesenhaBaseGuindaste()
 
 void DesenhaGuindaste()
 {
+    // Base
     glPushMatrix();
-        DesenhaBaseGuindaste();
+        DesenhaNivelGuindaste("gameObjects/baseGuindaste.txt",0,0);
+    glPopMatrix();
+    // Nível 1
+    glPushMatrix();
+        DesenhaNivelGuindaste("gameObjects/nivel1Guindaste.txt",1,9);
+    glPopMatrix();
+    // Nível 2
+    glPushMatrix();
+        DesenhaNivelGuindaste("gameObjects/nivel2Guindaste.txt",2,18);
+    glPopMatrix();
+    // Nível 3
+    glPushMatrix();
+        DesenhaNivelGuindaste("gameObjects/nivel3Guindaste.txt",3,27);
+    glPopMatrix();
+    // Nível 4
+    glPushMatrix();
+        DesenhaNivelGuindaste("gameObjects/nivel4Guindaste.txt",3,36);
     glPopMatrix();
 }
 
@@ -175,7 +195,7 @@ void display( void )
     // Define os limites lógicos da área OpenGL dentro da Janela
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho(0,80,0,60,0,1);
+    glOrtho(0,larguraLogica,0,alturaLogica,0,1);
 
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	// Coloque aqui as chamadas das rotinas que desenha os objetos
