@@ -22,7 +22,9 @@
 
 using namespace std;
 
-int larguraLogica = 80, alturaLogica = 60;
+int larguraLogica = 2*96, alturaLogica = 2*54;
+float baseDx = 0;
+float rotacaoN4 = 0;
 
 #ifdef WIN32
 #include <windows.h>
@@ -50,6 +52,8 @@ void animate()
 {
     static float dt;
     static float AccumTime=0;
+
+    rotacaoN4 += 0.5;
 
 #ifdef _WIN32
     DWORD time_now;
@@ -111,39 +115,37 @@ void reshape( int w, int h )
     glOrtho(0,10,0,10,0,1);
 }
 
-void DesenhaNivelGuindaste(string diretorio, int dx, int dy)
+void DesenhaNivelGuindaste(string diretorio)
 {
     int i, j, cor, nCores, linhas, colunas;
-    ifstream baseGuindaste;
+    ifstream arquivo;
     string conteudo;
 
-    baseGuindaste.open(diretorio);
-    baseGuindaste >> conteudo;
-    baseGuindaste >> nCores;
+    arquivo.open(diretorio);
+    arquivo >> conteudo;
+    arquivo >> nCores;
     float cores[nCores][3];
 
     for (i = 0; i < nCores; i++)
     {
-        baseGuindaste >> conteudo;
-        for (j = 0; j < 3; j++) baseGuindaste >> cores[i][j];
+        arquivo >> conteudo;
+        for (j = 0; j < 3; j++) arquivo >> cores[i][j];
     }
 
-    baseGuindaste >> conteudo;
-    baseGuindaste >> linhas;
-    baseGuindaste >> colunas;
-
+    arquivo >> conteudo;
+    arquivo >> linhas;
+    arquivo >> colunas;
 
     for (i = linhas; i > 0; i--)
     {
         for (j = colunas; j > 0; j--)
         {
-            baseGuindaste >> cor;
+            arquivo >> cor;
             cor--;
             //cout << cor << " ";
             //cout << cor << " --> " << cores[cor][0] << " " << cores[cor][1] << " " << cores[cor][2] << " : ";
             glPushMatrix();
             glColor3f(cores[cor][0],cores[cor][1],cores[cor][2]);
-            glTranslatef(dx,dy,0);
             glBegin(GL_QUADS);
                 glVertex2f(j-1,i);
                 glVertex2f(j,i);
@@ -155,30 +157,36 @@ void DesenhaNivelGuindaste(string diretorio, int dx, int dy)
         }
         //cout << endl;
     }
-    baseGuindaste.close();
+    arquivo.close();
 }
 
 void DesenhaGuindaste()
 {
+    glTranslatef(baseDx,0,0);
     // Base
     glPushMatrix();
-        DesenhaNivelGuindaste("gameObjects/baseGuindaste.txt",0,0);
+        DesenhaNivelGuindaste("gameObjects/baseGuindaste.txt");
     glPopMatrix();
     // Nível 1
     glPushMatrix();
-        DesenhaNivelGuindaste("gameObjects/nivel1Guindaste.txt",1,9);
+        glTranslatef(1,9,0);
+        DesenhaNivelGuindaste("gameObjects/nivel1Guindaste.txt");
     glPopMatrix();
     // Nível 2
     glPushMatrix();
-        DesenhaNivelGuindaste("gameObjects/nivel2Guindaste.txt",2,18);
+        glTranslatef(2,18,0);
+        DesenhaNivelGuindaste("gameObjects/nivel2Guindaste.txt");
     glPopMatrix();
     // Nível 3
     glPushMatrix();
-        DesenhaNivelGuindaste("gameObjects/nivel3Guindaste.txt",3,27);
+        glTranslatef(3,27,0);
+        DesenhaNivelGuindaste("gameObjects/nivel3Guindaste.txt");
     glPopMatrix();
     // Nível 4
     glPushMatrix();
-        DesenhaNivelGuindaste("gameObjects/nivel4Guindaste.txt",3,36);
+        glTranslatef(3,36,0);
+        glRotatef(rotacaoN4,0,0,1);
+        DesenhaNivelGuindaste("gameObjects/nivel4Guindaste.txt");
     glPopMatrix();
 }
 
@@ -261,6 +269,15 @@ void arrow_keys ( int a_keys, int x, int y )
             glutPositionWindow (50,50);
 			glutReshapeWindow ( 700, 500 );
 			break;
+
+        case GLUT_KEY_LEFT:
+            baseDx -= 1;
+            break;
+
+        case GLUT_KEY_RIGHT:
+            baseDx += 1;
+            break;
+
 		default:
 			break;
 	}
