@@ -22,9 +22,8 @@
 
 using namespace std;
 
-int larguraLogica = 2*96, alturaLogica = 2*54;
-float baseDx = 0;
-float rotacaoN4 = 0;
+int larguraLogica = 192, alturaLogica = 108;
+float baseDx = 92, baseDy = 8, rotacaoN1 = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
 
 #ifdef WIN32
 #include <windows.h>
@@ -52,8 +51,6 @@ void animate()
 {
     static float dt;
     static float AccumTime=0;
-
-    rotacaoN4 += 0.5;
 
 #ifdef _WIN32
     DWORD time_now;
@@ -115,7 +112,7 @@ void reshape( int w, int h )
     glOrtho(0,10,0,10,0,1);
 }
 
-void DesenhaNivelGuindaste(string diretorio)
+void DesenhaObjeto(string diretorio)
 {
     int i, j, cor, nCores, linhas, colunas;
     ifstream arquivo;
@@ -160,33 +157,76 @@ void DesenhaNivelGuindaste(string diretorio)
     arquivo.close();
 }
 
-void DesenhaGuindaste()
+void DesenhaNivel4Guindaste()
 {
-    glTranslatef(baseDx,0,0);
-    // Base
     glPushMatrix();
-        DesenhaNivelGuindaste("gameObjects/baseGuindaste.txt");
+        glTranslatef(3,39,0);
+            glTranslatef(1.5,0,0); // Transformação para rotação
+            glRotatef(rotacaoN4,0,0,1);
+            glTranslatef(-1.5,0,0); // Transformação para rotação
+            DesenhaObjeto("gameObjects/nivel4Guindaste.txt");
+        glTranslatef(-3,-39,0);
     glPopMatrix();
-    // Nível 1
+}
+
+void DesenhaNivel3Guindaste()
+{
+    glPushMatrix();
+        glTranslatef(3,25,0);
+            glTranslatef(2.5,0,0);
+            glRotatef(rotacaoN3,0,0,1);
+            glTranslatef(-2.5,0,0);
+            DesenhaObjeto("gameObjects/nivel3Guindaste.txt");
+        glTranslatef(-3,-25,0);
+        DesenhaNivel4Guindaste();
+    glPopMatrix();
+}
+
+void DesenhaNivel2Guindaste()
+{
+    glPushMatrix();
+        glTranslatef(2,17,0);
+            glTranslatef(3.5,0,0);
+            glRotatef(rotacaoN2,0,0,1);
+            glTranslatef(-3.5,0,0);
+            DesenhaObjeto("gameObjects/nivel2Guindaste.txt");
+        glTranslatef(-2,-17,0);
+        DesenhaNivel3Guindaste();
+    glPopMatrix();
+}
+
+void DesenhaNivel1Guindaste()
+{
     glPushMatrix();
         glTranslatef(1,9,0);
-        DesenhaNivelGuindaste("gameObjects/nivel1Guindaste.txt");
+        DesenhaObjeto("gameObjects/nivel1Guindaste.txt");
+        glTranslatef(-1,-9,0);
+        DesenhaNivel2Guindaste();
     glPopMatrix();
-    // Nível 2
+}
+
+void DesenhaBaseGuindaste()
+{
     glPushMatrix();
-        glTranslatef(2,18,0);
-        DesenhaNivelGuindaste("gameObjects/nivel2Guindaste.txt");
+        DesenhaObjeto("gameObjects/baseGuindaste.txt");
+        DesenhaNivel1Guindaste();
     glPopMatrix();
-    // Nível 3
+}
+
+void DesenhaGuindaste()
+{
+    glTranslatef(baseDx,baseDy,0);
+    DesenhaBaseGuindaste();
+}
+
+void DesenhaPisoParedes()
+{
     glPushMatrix();
-        glTranslatef(3,27,0);
-        DesenhaNivelGuindaste("gameObjects/nivel3Guindaste.txt");
-    glPopMatrix();
-    // Nível 4
-    glPushMatrix();
-        glTranslatef(3,36,0);
-        glRotatef(rotacaoN4,0,0,1);
-        DesenhaNivelGuindaste("gameObjects/nivel4Guindaste.txt");
+        DesenhaObjeto("gameObjects/piso.txt");
+        glTranslatef(0,8,0);
+        DesenhaObjeto("gameObjects/paredes.txt");
+        glTranslatef(182,0,0);
+        DesenhaObjeto("gameObjects/paredes.txt");
     glPopMatrix();
 }
 
@@ -209,24 +249,8 @@ void display( void )
 	// Coloque aqui as chamadas das rotinas que desenha os objetos
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	/*glLineWidth(3);
-	glColor3f(1,0,0);
-
-	glBegin(GL_LINES);
-	  glVertex2f(0,0);
-	  glVertex2f(5,5);
-	glEnd();
-
-	glLineWidth(3);
-	glColor3f(0,1,0);
-	glBegin(GL_LINES);
-	  glVertex2f(5,5);
-	  glVertex2f(10,0);
-	glEnd();*/
-
-	glPushMatrix();
-        DesenhaGuindaste();
-	glPopMatrix();
+    DesenhaPisoParedes();
+    DesenhaGuindaste();
 
 	glutSwapBuffers();
 }
@@ -245,6 +269,36 @@ void keyboard ( unsigned char key, int x, int y )
 		case 27:        // Termina o programa qdo
 			exit ( 0 );   // a tecla ESC for pressionada
 			break;
+
+        case 'q':
+            rotacaoN4 += rotacaoN4 < 90 ? 5 : 0;
+            cout << rotacaoN4 << endl;
+            break;
+
+        case 'w':
+            rotacaoN4 -= rotacaoN4 > -90 ? 5 : 0;
+            cout << rotacaoN4 << endl;
+            break;
+
+        case 'a':
+            rotacaoN3 += rotacaoN3 < 45 ? 5 : 0;
+            cout << rotacaoN3 << endl;
+            break;
+
+        case 's':
+            rotacaoN3 -= rotacaoN3 > -45 ? 5 : 0;
+            cout << rotacaoN3 << endl;
+            break;
+
+        case 'z':
+            rotacaoN2 += rotacaoN2 < 45 ? 5 : 0;
+            cout << rotacaoN2 << endl;
+            break;
+
+        case 'x':
+            rotacaoN2 -= rotacaoN2 > -45 ? 5 : 0;
+            cout << rotacaoN2 << endl;
+            break;
 
 		default:
 			break;
