@@ -22,8 +22,9 @@
 
 using namespace std;
 
-int larguraLogica = 192, alturaLogica = 108;
-float baseDx = 92, baseDy = 8, rotacaoN1 = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
+//int larguraLogica = 192, alturaLogica = 108;
+int larguraLogica = 200, alturaLogica = 100;
+float baseDx = -4.5, baseDy = 0, rotacaoN1 = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
 
 #ifdef WIN32
 #include <windows.h>
@@ -109,7 +110,7 @@ void reshape( int w, int h )
     // Define os limites lógicos da área OpenGL dentro da Janela
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho(0,10,0,10,0,1);
+    glOrtho(0,larguraLogica,0,alturaLogica,0,1);
 }
 
 void DesenhaObjeto(string diretorio)
@@ -118,7 +119,7 @@ void DesenhaObjeto(string diretorio)
     ifstream arquivo;
     string conteudo;
 
-    arquivo.open(diretorio);
+    arquivo.open(diretorio.c_str());
     arquivo >> conteudo;
     arquivo >> nCores;
     float cores[nCores][3];
@@ -144,6 +145,10 @@ void DesenhaObjeto(string diretorio)
             glPushMatrix();
             glColor3f(cores[cor][0],cores[cor][1],cores[cor][2]);
             glBegin(GL_QUADS);
+                /*glVertex2f(j-1,i);
+                glVertex2f(j,i);
+                glVertex2f(j,i-1);
+                glVertex2f(j-1,i-1);*/
                 glVertex2f(j-1,i);
                 glVertex2f(j,i);
                 glVertex2f(j,i-1);
@@ -249,8 +254,18 @@ void display( void )
 	// Coloque aqui as chamadas das rotinas que desenha os objetos
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-    DesenhaPisoParedes();
+    //DesenhaPisoParedes();
+
+    // Desenha a o guindaste centralizado no mundo
+    glTranslatef(larguraLogica/2,0,0);
     DesenhaGuindaste();
+
+    /*
+        Ponto p1 = {0,10,0};
+        Ponto p1_new;
+        CalculaPonto(p1,p1_new);
+
+    */
 
 	glutSwapBuffers();
 }
