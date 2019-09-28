@@ -111,7 +111,7 @@ void reshape( int w, int h )
     // Define os limites lógicos da área OpenGL dentro da Janela
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho(0,larguraLogica,0,alturaLogica,0,1);
+    glOrtho((-1)*larguraLogica,larguraLogica,(-1)*alturaLogica,alturaLogica,0,1);
 }
 
 void CarregaObjeto(string diretorio, int index)
@@ -157,52 +157,83 @@ void CarregaObjeto(string diretorio, int index)
 void DesenhaObjeto(int index)
 {
     int i, j, linhas, colunas, cor;
+    float dx;
 
     linhas = objetos[index].size();
     colunas = objetos[index][0].size();
+    dx = colunas/2.0;
 
     for (i = 0; i < linhas; i++)
     {
         for (j = 0; j < colunas; j++)
         {
             cor = objetos[index][i][j] - 1;
-            //cout << cor << " ";
             glPushMatrix();
             glColor3f(cores[index][cor][0], cores[index][cor][1], cores[index][cor][2]);
             glBegin(GL_QUADS);
-                glVertex2f(j-1,i);
-                glVertex2f(j,i);
-                glVertex2f(j,i-1);
-                glVertex2f(j-1,i-1);
+                glVertex2f(j-dx,i);
+                glVertex2f(j-dx,i+1);
+                glVertex2f(j-dx+1,i+1);
+                glVertex2f(j-dx+1,i);
             glEnd();
             glPopMatrix();
         }
-        cout << endl;
     }
-    cout << endl << endl;
+}
+
+void DesenhaNivel4Robo()
+{
+    glPushMatrix();
+        glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
+        DesenhaObjeto(6);
+    glPopMatrix();
+}
+
+void DesenhaNivel3Robo()
+{
+    glPushMatrix();
+        glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
+        glTranslatef(0.0, objetos[4].size(), 0.0);
+        DesenhaObjeto(5);
+        DesenhaNivel4Robo();
+    glPopMatrix();
+}
+
+void DesenhaNivel2Robo()
+{
+    glPushMatrix();
+        glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
+        glTranslatef(0.0, objetos[3].size(), 0.0);
+        DesenhaObjeto(4);
+        DesenhaNivel3Robo();
+    glPopMatrix();
+}
+
+void DesenhaNivel1Robo()
+{
+    glPushMatrix();
+        glTranslatef(0.0, objetos[2].size(), 0.0);
+        DesenhaObjeto(3);
+        DesenhaNivel2Robo();
+    glPopMatrix();
 }
 
 void DesenhaBaseRobo()
 {
-    DesenhaObjeto(2);
+    glPushMatrix();
+        DesenhaObjeto(2);
+        DesenhaNivel1Robo();
+    glPopMatrix();
 }
 
 void DesenhaRobo()
 {
-    glTranslatef(0,0,0);
-    DesenhaBaseRobo();
+    glPushMatrix();
+        DesenhaBaseRobo();
+    glPopMatrix();
 }
 
-/*void DesenhaPisoParedes()
-{
-    glPushMatrix();
-        DesenhaObjeto("gameObjects/piso.txt");
-        glTranslatef(0,8,0);
-        DesenhaObjeto("gameObjects/paredes.txt");
-        glTranslatef(182,0,0);
-        DesenhaObjeto("gameObjects/paredes.txt");
-    glPopMatrix();
-}*/
+
 
 // **********************************************************************
 //  void display( void )
@@ -226,6 +257,7 @@ void display( void )
 
 	glPushMatrix();
         glColor3f(0,0,0);
+        glLineWidth(10);
         glBegin(GL_LINES);
             // Vertical axis
             glVertex2d(0,(-1)*alturaLogica);
@@ -238,8 +270,6 @@ void display( void )
 
     //DesenhaPisoParedes();
 
-    // Desenha a o robo centralizado no mundo
-    //glTranslatef(larguraLogica/2,0,0);
     DesenhaRobo();
 
     /*
@@ -268,32 +298,32 @@ void keyboard ( unsigned char key, int x, int y )
 
         case 'q':
             rotacaoN4 += rotacaoN4 < 90 ? 5 : 0;
-            cout << rotacaoN4 << endl;
+            //cout << rotacaoN4 << endl;
             break;
 
         case 'w':
             rotacaoN4 -= rotacaoN4 > -90 ? 5 : 0;
-            cout << rotacaoN4 << endl;
+            //cout << rotacaoN4 << endl;
             break;
 
         case 'a':
             rotacaoN3 += rotacaoN3 < 45 ? 5 : 0;
-            cout << rotacaoN3 << endl;
+            //cout << rotacaoN3 << endl;
             break;
 
         case 's':
             rotacaoN3 -= rotacaoN3 > -45 ? 5 : 0;
-            cout << rotacaoN3 << endl;
+            //cout << rotacaoN3 << endl;
             break;
 
         case 'z':
             rotacaoN2 += rotacaoN2 < 45 ? 5 : 0;
-            cout << rotacaoN2 << endl;
+            //cout << rotacaoN2 << endl;
             break;
 
         case 'x':
             rotacaoN2 -= rotacaoN2 > -45 ? 5 : 0;
-            cout << rotacaoN2 << endl;
+            //cout << rotacaoN2 << endl;
             break;
 
 		default:
