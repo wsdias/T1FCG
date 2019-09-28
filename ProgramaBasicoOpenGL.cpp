@@ -19,12 +19,14 @@
 #include <string>
 #include <cmath>
 #include <ctime>
+#include <vector>
 
 using namespace std;
 
-//int larguraLogica = 192, alturaLogica = 108;
-int larguraLogica = 200, alturaLogica = 100;
-float baseDx = -4.5, baseDy = 0, rotacaoN1 = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
+int larguraLogica = 96, alturaLogica = 54;
+float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
+vector<vector<vector<float>>> cores; //[objeto][cor][componente]
+vector<vector<vector<int>>> objetos; //[objeto][x][y]
 
 #ifdef WIN32
 #include <windows.h>
@@ -91,7 +93,6 @@ void init(void)
 {
 	// Define a cor do fundo da tela (BRANCO)
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
 }
 
 // **********************************************************************
@@ -113,118 +114,86 @@ void reshape( int w, int h )
     glOrtho(0,larguraLogica,0,alturaLogica,0,1);
 }
 
-void DesenhaObjeto(string diretorio)
+void CarregaObjeto(string diretorio, int index)
 {
     int i, j, cor, nCores, linhas, colunas;
     ifstream arquivo;
     string conteudo;
 
     arquivo.open(diretorio.c_str());
+
     arquivo >> conteudo;
     arquivo >> nCores;
-    float cores[nCores][3];
+
+    cores.resize(cores.size() + 1);
+    cores[index].resize(nCores);
 
     for (i = 0; i < nCores; i++)
     {
         arquivo >> conteudo;
-        for (j = 0; j < 3; j++) arquivo >> cores[i][j];
+        cores[index][i].resize(3);
+        for (j = 0; j < 3; j++) arquivo >> cores[index][i][j];
     }
 
     arquivo >> conteudo;
     arquivo >> linhas;
     arquivo >> colunas;
 
-    for (i = linhas; i > 0; i--)
+    objetos.resize(objetos.size() + 1);
+    objetos[index].resize(linhas);
+    for (i = linhas-1; i >= 0; i--)
     {
-        for (j = colunas; j > 0; j--)
+        objetos[index][i].resize(colunas);
+        for (j = 0; j < colunas; j++)
         {
             arquivo >> cor;
-            cor--;
+            objetos[index][i][j] = cor;
+        }
+    }
+
+    arquivo.close();
+}
+
+void DesenhaObjeto(int index)
+{
+    int i, j, linhas, colunas, cor;
+
+    linhas = objetos[index].size();
+    colunas = objetos[index][0].size();
+
+    for (i = 0; i < linhas; i++)
+    {
+        for (j = 0; j < colunas; j++)
+        {
+            cor = objetos[index][i][j] - 1;
             //cout << cor << " ";
-            //cout << cor << " --> " << cores[cor][0] << " " << cores[cor][1] << " " << cores[cor][2] << " : ";
             glPushMatrix();
-            glColor3f(cores[cor][0],cores[cor][1],cores[cor][2]);
+            glColor3f(cores[index][cor][0], cores[index][cor][1], cores[index][cor][2]);
             glBegin(GL_QUADS);
-                /*glVertex2f(j-1,i);
-                glVertex2f(j,i);
-                glVertex2f(j,i-1);
-                glVertex2f(j-1,i-1);*/
                 glVertex2f(j-1,i);
                 glVertex2f(j,i);
                 glVertex2f(j,i-1);
                 glVertex2f(j-1,i-1);
             glEnd();
             glPopMatrix();
-            //cout << "(" << i << ", " << j << ") ";
         }
-        //cout << endl;
+        cout << endl;
     }
-    arquivo.close();
+    cout << endl << endl;
 }
 
-void DesenhaNivel4Guindaste()
+void DesenhaBaseRobo()
 {
-    glPushMatrix();
-        glTranslatef(3,39,0);
-            glTranslatef(1.5,0,0); // Transformação para rotação
-            glRotatef(rotacaoN4,0,0,1);
-            glTranslatef(-1.5,0,0); // Transformação para rotação
-            DesenhaObjeto("gameObjects/nivel4Guindaste.txt");
-        glTranslatef(-3,-39,0);
-    glPopMatrix();
+    DesenhaObjeto(2);
 }
 
-void DesenhaNivel3Guindaste()
+void DesenhaRobo()
 {
-    glPushMatrix();
-        glTranslatef(3,25,0);
-            glTranslatef(2.5,0,0);
-            glRotatef(rotacaoN3,0,0,1);
-            glTranslatef(-2.5,0,0);
-            DesenhaObjeto("gameObjects/nivel3Guindaste.txt");
-        glTranslatef(-3,-25,0);
-        DesenhaNivel4Guindaste();
-    glPopMatrix();
+    glTranslatef(0,0,0);
+    DesenhaBaseRobo();
 }
 
-void DesenhaNivel2Guindaste()
-{
-    glPushMatrix();
-        glTranslatef(2,17,0);
-            glTranslatef(3.5,0,0);
-            glRotatef(rotacaoN2,0,0,1);
-            glTranslatef(-3.5,0,0);
-            DesenhaObjeto("gameObjects/nivel2Guindaste.txt");
-        glTranslatef(-2,-17,0);
-        DesenhaNivel3Guindaste();
-    glPopMatrix();
-}
-
-void DesenhaNivel1Guindaste()
-{
-    glPushMatrix();
-        glTranslatef(1,9,0);
-        DesenhaObjeto("gameObjects/nivel1Guindaste.txt");
-        glTranslatef(-1,-9,0);
-        DesenhaNivel2Guindaste();
-    glPopMatrix();
-}
-
-void DesenhaBaseGuindaste()
-{
-    glPushMatrix();
-        DesenhaObjeto("gameObjects/baseGuindaste.txt");
-        DesenhaNivel1Guindaste();
-    glPopMatrix();
-}
-
-void DesenhaGuindaste()
-{
-    glTranslatef(baseDx,baseDy,0);
-    DesenhaBaseGuindaste();
-}
-
-void DesenhaPisoParedes()
+/*void DesenhaPisoParedes()
 {
     glPushMatrix();
         DesenhaObjeto("gameObjects/piso.txt");
@@ -233,7 +202,7 @@ void DesenhaPisoParedes()
         glTranslatef(182,0,0);
         DesenhaObjeto("gameObjects/paredes.txt");
     glPopMatrix();
-}
+}*/
 
 // **********************************************************************
 //  void display( void )
@@ -248,23 +217,35 @@ void display( void )
     // Define os limites lógicos da área OpenGL dentro da Janela
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho(0,larguraLogica,0,alturaLogica,0,1);
+    //glOrtho(0,larguraLogica,0,alturaLogica,0,1);
+    glOrtho((-1)*larguraLogica,larguraLogica,(-1)*alturaLogica,alturaLogica,0,1);
 
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	// Coloque aqui as chamadas das rotinas que desenha os objetos
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+	glPushMatrix();
+        glColor3f(0,0,0);
+        glBegin(GL_LINES);
+            // Vertical axis
+            glVertex2d(0,(-1)*alturaLogica);
+            glVertex2d(0,alturaLogica);
+            // Horizontal axis
+            glVertex2d((-1)*larguraLogica,0);
+            glVertex2d(larguraLogica,0);
+        glEnd();
+	glPopMatrix();
+
     //DesenhaPisoParedes();
 
-    // Desenha a o guindaste centralizado no mundo
-    glTranslatef(larguraLogica/2,0,0);
-    DesenhaGuindaste();
+    // Desenha a o robo centralizado no mundo
+    //glTranslatef(larguraLogica/2,0,0);
+    DesenhaRobo();
 
     /*
         Ponto p1 = {0,10,0};
         Ponto p1_new;
         CalculaPonto(p1,p1_new);
-
     */
 
 	glutSwapBuffers();
@@ -352,6 +333,17 @@ void arrow_keys ( int a_keys, int x, int y )
 	}
 }
 
+void CarregaCenario()
+{
+    CarregaObjeto("gameObjects/piso.txt", 0);
+    CarregaObjeto("gameObjects/paredes.txt", 1);
+    CarregaObjeto("gameObjects/baseRobo.txt", 2);
+    CarregaObjeto("gameObjects/nivel1Robo.txt", 3);
+    CarregaObjeto("gameObjects/nivel2Robo.txt", 4);
+    CarregaObjeto("gameObjects/nivel3Robo.txt", 5);
+    CarregaObjeto("gameObjects/nivel4Robo.txt", 6);
+}
+
 // **********************************************************************
 //  void main ( int argc, char** argv )
 //
@@ -359,6 +351,9 @@ void arrow_keys ( int a_keys, int x, int y )
 // **********************************************************************
 int  main ( int argc, char** argv )
 {
+    // Carrega objetos
+    CarregaCenario();
+
     glutInit            ( &argc, argv );
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB );
     glutInitWindowPosition (0,0);
