@@ -154,14 +154,12 @@ void CarregaObjeto(string diretorio, int index)
     arquivo.close();
 }
 
-void DesenhaObjeto(int index)
+void DesenhaObjeto(int index, float dx, float dy)
 {
     int i, j, linhas, colunas, cor;
-    float dx;
 
     linhas = objetos[index].size();
     colunas = objetos[index][0].size();
-    dx = colunas/2.0;
 
     for (i = 0; i < linhas; i++)
     {
@@ -171,10 +169,10 @@ void DesenhaObjeto(int index)
             glPushMatrix();
             glColor3f(cores[index][cor][0], cores[index][cor][1], cores[index][cor][2]);
             glBegin(GL_QUADS);
-                glVertex2f(j-dx,i);
-                glVertex2f(j-dx,i+1);
-                glVertex2f(j-dx+1,i+1);
-                glVertex2f(j-dx+1,i);
+                glVertex2f(j-dx,i+dy);
+                glVertex2f(j-dx,i+dy+1);
+                glVertex2f(j-dx+1,i+dy+1);
+                glVertex2f(j-dx+1,i+dy);
             glEnd();
             glPopMatrix();
         }
@@ -184,17 +182,18 @@ void DesenhaObjeto(int index)
 void DesenhaNivel4Robo()
 {
     glPushMatrix();
+        glTranslatef(0.0, objetos[5].size() - 1.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
         glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
-        DesenhaObjeto(6);
+        DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
     glPopMatrix();
 }
 
 void DesenhaNivel3Robo()
 {
     glPushMatrix();
+        glTranslatef(0.0, objetos[4].size() - 1.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
         glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
-        glTranslatef(0.0, objetos[4].size(), 0.0);
-        DesenhaObjeto(5);
+        DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
         DesenhaNivel4Robo();
     glPopMatrix();
 }
@@ -202,9 +201,9 @@ void DesenhaNivel3Robo()
 void DesenhaNivel2Robo()
 {
     glPushMatrix();
+        glTranslatef(0.0, objetos[3].size() - 1.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
         glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
-        glTranslatef(0.0, objetos[3].size(), 0.0);
-        DesenhaObjeto(4);
+        DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
         DesenhaNivel3Robo();
     glPopMatrix();
 }
@@ -213,7 +212,7 @@ void DesenhaNivel1Robo()
 {
     glPushMatrix();
         glTranslatef(0.0, objetos[2].size(), 0.0);
-        DesenhaObjeto(3);
+        DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0);
         DesenhaNivel2Robo();
     glPopMatrix();
 }
@@ -221,7 +220,7 @@ void DesenhaNivel1Robo()
 void DesenhaBaseRobo()
 {
     glPushMatrix();
-        DesenhaObjeto(2);
+        DesenhaObjeto(2, objetos[2][0].size()/2.0, 0.0);
         DesenhaNivel1Robo();
     glPopMatrix();
 }
@@ -229,6 +228,7 @@ void DesenhaBaseRobo()
 void DesenhaRobo()
 {
     glPushMatrix();
+        glTranslatef(0.0, (-1) * alturaLogica/2.0, 0.0);
         DesenhaBaseRobo();
     glPopMatrix();
 }
@@ -255,7 +255,7 @@ void display( void )
 	// Coloque aqui as chamadas das rotinas que desenha os objetos
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	glPushMatrix();
+	/*glPushMatrix();
         glColor3f(0,0,0);
         glLineWidth(10);
         glBegin(GL_LINES);
@@ -266,7 +266,7 @@ void display( void )
             glVertex2d((-1)*larguraLogica,0);
             glVertex2d(larguraLogica,0);
         glEnd();
-	glPopMatrix();
+	glPopMatrix();*/
 
     //DesenhaPisoParedes();
 
