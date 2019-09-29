@@ -23,11 +23,6 @@
 
 using namespace std;
 
-int larguraLogica = 192, alturaLogica = 108;
-float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
-vector<vector<vector<float>>> cores; //[objeto][cor][componente]
-vector<vector<vector<int>>> objetos; //[objeto][x][y]
-
 #ifdef WIN32
 #include <windows.h>
 #include <glut.h>
@@ -50,6 +45,12 @@ typedef struct
     GLfloat x, y, z;
 } Ponto;
 
+int larguraLogica = 192, alturaLogica = 108;
+float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
+vector<vector<vector<float>>> cores; // [objeto][cor][componente]
+vector<vector<vector<int>>> objetos; // [objeto][x][y]
+vector<vector<Ponto>> pontos; // [objeto][ponto]
+
 void CalculaPonto(Ponto p, Ponto &out) {
 
     GLfloat ponto_novo[4];
@@ -68,6 +69,21 @@ void CalculaPonto(Ponto p, Ponto &out) {
     out.y = ponto_novo[1];
     out.z = ponto_novo[2];
 }
+
+int intersec2d(Ponto k, Ponto l, Ponto m, Ponto n, double &s, double &t)
+{
+    double det;
+
+    det = (n.x - m.x) * (l.y - k.y)  -  (n.y - m.y) * (l.x - k.x);
+
+    if (det == 0.0) return 0 ; // não há intersecção
+
+    s = ((n.x - m.x) * (m.y - k.y) - (n.y - m.y) * (m.x - k.x))/ det ;
+    t = ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det ;
+
+    return 1; // há intersecção
+}
+
 
 // **********************************************************************
 //  void animate ( unsigned char key, int x, int y )
@@ -205,11 +221,55 @@ void DesenhaObjeto(int index, float dx, float dy)
 
 // -------------------------------------------------- //
 
+void CalcInterRoboCaixas()
+{
+    double *s, *t;
+    Ponto a = pontos[6][0], b = pontos[6][0],
+          c = pontos[7][0], d = pontos[7][0];
+
+    //a.x -= objetos[6][0].size(); a.y += 1;
+    a.x -= objetos[6][0].size(); a.y += 0;
+    b.x += 0; b.y += 0;
+
+    c.x -= 0.5; c.y += 0;
+    d.x += 0.5; d.y += 0;
+
+    cout << "A(" << a.x << ", " << a.y << ")" << endl;
+    cout << "B(" << b.x << ", " << b.y << ")" << endl;
+
+    //cout << "C(" << c.x << ", " << c.y << ")" << endl;
+    //cout << "D(" << d.x << ", " << d.y << ")" << endl;
+
+    //cout << intersec2d(a, b, c, d, *s, *t) << endl;
+
+    glPushMatrix();
+        glLineWidth(10);
+        glColor3f(0, 1, 0);
+        //glRotatef(rotacaoN2,0,0,1);
+        //glRotatef(rotacaoN4,0,0,1);
+        glBegin(GL_LINES);
+            glVertex2d(a.x, a.y);
+            glVertex2d(b.x, b.y);
+        glEnd();
+        glColor3f(1, 0, 0);
+        glBegin(GL_LINES);
+            glVertex2d(c.x, c.y);
+            glVertex2d(d.x, d.y);
+        glEnd();
+    glPopMatrix();
+}
+
 void DesenhaCaixa1()
 {
+    Ponto a = {objetos[7][0].size()/2.0, objetos[7].size(), 0.0}, b;
+
     glPushMatrix();
-        //glTranslatef(10.0, 0.0, 0.0);
-        DesenhaObjeto(7, 0.0, 0.0);
+        //glTranslatef(larguraLogica/2.0 - 15.0, 0.0, 0.0);
+        //glTranslatef(4.5, 0.0, 0.0);
+        DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0);
+        CalculaPonto(a,b);
+        pontos[7][0] = b;
+        //cout << "(" << b.x << ", " << b.y << ")" << endl;
     glPopMatrix();
 }
 
@@ -225,42 +285,52 @@ void DesenhaCaixas()
 
 void DesenhaNivel4Robo()
 {
+    Ponto a = {objetos[6][0].size()/2.0, objetos[6].size(), 0.0}, b;
+
     glPushMatrix();
         glTranslatef(0.0, objetos[5].size() - 1.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
         glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
         DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+        CalculaPonto(a,b);
+        pontos[6][0] = b;
+        cout << "A:(" << a.x << ", " << a.y << ")" << endl;
+        cout << "B:(" << b.x << ", " << b.y << ")" << endl;
     glPopMatrix();
 }
 
 void DesenhaNivel3Robo()
 {
+    //Ponto a = {objetos[5][0].size()/2.0, objetos[5].size(), 0.0}, b;
+
     glPushMatrix();
-        glTranslatef(0.0, objetos[4].size() - 1.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
+        glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
         glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
         DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
         DesenhaNivel4Robo();
+        //CalculaPonto(a,b);
+        //cout << "(" << b.x << ", " << b.y << ")" << endl;
     glPopMatrix();
 }
 
 void DesenhaNivel2Robo()
 {
-    Ponto a = {objetos[4][0].size()/2.0, objetos[4].size(), 0.0}, b;
+    //Ponto a = {objetos[4][0].size()/2.0, objetos[4].size(), 0.0}, b;
 
     glPushMatrix();
-        glTranslatef(0.0, objetos[3].size() - 1.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
+        glTranslatef(0.0, objetos[3].size() - 2.0, 0.0); // Posiciona acima do nível, deslocando uma unidade abaixo (sobrepõe)
         glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
         DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
-        CalculaPonto(a,b);
-        cout << "(" << b.x << ", " << b.y << ")" << endl;
-        //DesenhaNivel3Robo();
+        //CalculaPonto(a,b);
+        //cout << "(" << b.x << ", " << b.y << ")" << endl;
+        DesenhaNivel3Robo();
     glPopMatrix();
 }
 
 void DesenhaNivel1Robo()
 {
     glPushMatrix();
-        glTranslatef(0.0, objetos[2].size(), 0.0);
-        DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0);
+        glTranslatef(0.0, objetos[2].size(), 0.0); // Posiciona acima da base
+        DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0); // Desenha de forma centralizada (em relação ao SRO)
         DesenhaNivel2Robo();
     glPopMatrix();
 }
@@ -277,7 +347,8 @@ void DesenhaRobo()
 {
     glPushMatrix();
         glTranslatef(baseDx, baseDy, 0.0); // Movimenta em relação ao universo
-        //glTranslatef(0.0, (-1) * alturaLogica + 10, 0.0); // Posicina em relação universo
+        //glTranslatef(larguraLogica/2.0, 0.0, 0.0); // Posicina em relação universo
+        glTranslatef(15, 0.0, 0.0); // Posicina em relação universo
         DesenhaBaseRobo();
     glPopMatrix();
 }
@@ -307,22 +378,25 @@ void display( void )
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	// Axis
-	/*glPushMatrix();
+	glPushMatrix();
         glColor3f(0,0,0);
         glLineWidth(10);
         glBegin(GL_LINES);
             // Vertical axis
-            glVertex2d(0,(-1)*alturaLogica);
-            glVertex2d(0,alturaLogica);
+            glVertex2d(larguraLogica/2.0, 0);
+            glVertex2d(larguraLogica/2.0, alturaLogica);
             // Horizontal axis
-            glVertex2d((-1)*larguraLogica,0);
-            glVertex2d(larguraLogica,0);
+            glVertex2d(0, alturaLogica/2.0);
+            glVertex2d(larguraLogica, alturaLogica/2.0);
         glEnd();
-	glPopMatrix();*/
+	glPopMatrix();
 
     //DesenhaPisoParedes();
     DesenhaCaixas();
     DesenhaRobo();
+
+    for (int i = 0; i < 8; i++) cout << "P" << i << ": (" << pontos[i][0].x  << ", " << pontos[i][0].y << ")" << endl;
+    CalcInterRoboCaixas();
 
     /*Ponto pa = {5, 10, 0}, pb = {0, 0, 0};
     glColor3f(0.25, 0.75, 0.50);
@@ -423,6 +497,8 @@ void arrow_keys ( int a_keys, int x, int y )
 
 void CarregaCenario()
 {
+    int i;
+
     CarregaObjeto("gameObjects/piso.txt", 0);
     CarregaObjeto("gameObjects/paredes.txt", 1);
     CarregaObjeto("gameObjects/baseRobo.txt", 2);
@@ -431,6 +507,13 @@ void CarregaCenario()
     CarregaObjeto("gameObjects/nivel3Robo.txt", 5);
     CarregaObjeto("gameObjects/nivel4Robo.txt", 6);
     CarregaObjeto("gameObjects/caixaAmarela.txt", 7);
+
+    for (i = 0; i < 8; i++)
+    {
+        pontos.resize(pontos.size()+1);
+        pontos[i].resize(1);
+        pontos[i][0] = {0, 0, 0};
+    }
 }
 
 // **********************************************************************
