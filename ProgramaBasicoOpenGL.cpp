@@ -23,7 +23,7 @@
 
 using namespace std;
 
-int larguraLogica = 96, alturaLogica = 54;
+int larguraLogica = 192, alturaLogica = 108;
 float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
 vector<vector<vector<float>>> cores; //[objeto][cor][componente]
 vector<vector<vector<int>>> objetos; //[objeto][x][y]
@@ -44,6 +44,30 @@ static struct timeval last_idle_time;
 #ifdef __linux__
 #include <glut.h>
 #endif
+
+typedef struct
+{
+    GLfloat x, y, z;
+} Ponto;
+
+void CalculaPonto(Ponto p, Ponto &out) {
+
+    GLfloat ponto_novo[4];
+    GLfloat matriz_gl[4][4];
+    int  i;
+
+    glGetFloatv(GL_MODELVIEW_MATRIX,&matriz_gl[0][0]);
+
+    for(i=0; i<4; i++) {
+        ponto_novo[i] = matriz_gl[0][i] * p.x +
+                        matriz_gl[1][i] * p.y +
+                        matriz_gl[2][i] * p.z +
+                        matriz_gl[3][i];
+    }
+    out.x = ponto_novo[0];
+    out.y = ponto_novo[1];
+    out.z = ponto_novo[2];
+}
 
 // **********************************************************************
 //  void animate ( unsigned char key, int x, int y )
@@ -111,7 +135,7 @@ void reshape( int w, int h )
     // Define os limites lógicos da área OpenGL dentro da Janela
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho((-1)*larguraLogica,larguraLogica,(-1)*alturaLogica,alturaLogica,0,1);
+    //glOrtho((-1)*larguraLogica,larguraLogica,(-1)*alturaLogica,alturaLogica,0,1);
 }
 
 void CarregaObjeto(string diretorio, int index)
@@ -166,7 +190,7 @@ void DesenhaObjeto(int index, float dx, float dy)
         for (j = 0; j < colunas; j++)
         {
             cor = objetos[index][i][j] - 1;
-            glPushMatrix();
+            //glPushMatrix();
             glColor3f(cores[index][cor][0], cores[index][cor][1], cores[index][cor][2]);
             glBegin(GL_QUADS);
                 glVertex2f(j-dx,i+dy);
@@ -174,10 +198,30 @@ void DesenhaObjeto(int index, float dx, float dy)
                 glVertex2f(j-dx+1,i+dy+1);
                 glVertex2f(j-dx+1,i+dy);
             glEnd();
-            glPopMatrix();
+            //glPopMatrix();
         }
     }
 }
+
+// -------------------------------------------------- //
+
+void DesenhaCaixa1()
+{
+    glPushMatrix();
+        //glTranslatef(10.0, 0.0, 0.0);
+        DesenhaObjeto(7, 0.0, 0.0);
+    glPopMatrix();
+}
+
+void DesenhaCaixas()
+{
+    glPushMatrix();
+        //glTranslatef(0.0, , 0.0);
+        DesenhaCaixa1();
+    glPopMatrix();
+}
+
+// -------------------------------------------------- //
 
 void DesenhaNivel4Robo()
 {
@@ -200,11 +244,15 @@ void DesenhaNivel3Robo()
 
 void DesenhaNivel2Robo()
 {
+    Ponto a = {objetos[4][0].size()/2.0, objetos[4].size(), 0.0}, b;
+
     glPushMatrix();
         glTranslatef(0.0, objetos[3].size() - 1.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
         glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
         DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
-        DesenhaNivel3Robo();
+        CalculaPonto(a,b);
+        cout << "(" << b.x << ", " << b.y << ")" << endl;
+        //DesenhaNivel3Robo();
     glPopMatrix();
 }
 
@@ -228,11 +276,11 @@ void DesenhaBaseRobo()
 void DesenhaRobo()
 {
     glPushMatrix();
-        glTranslatef(0.0, (-1) * alturaLogica/2.0, 0.0);
+        glTranslatef(baseDx, baseDy, 0.0); // Movimenta em relação ao universo
+        //glTranslatef(0.0, (-1) * alturaLogica + 10, 0.0); // Posicina em relação universo
         DesenhaBaseRobo();
     glPopMatrix();
 }
-
 
 
 // **********************************************************************
@@ -246,15 +294,19 @@ void display( void )
 	glClear(GL_COLOR_BUFFER_BIT);
 
     // Define os limites lógicos da área OpenGL dentro da Janela
-	glMatrixMode(GL_MODELVIEW);
+	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glOrtho(0,larguraLogica,0,alturaLogica,0,1);
-    glOrtho((-1)*larguraLogica,larguraLogica,(-1)*alturaLogica,alturaLogica,0,1);
+    glOrtho(0, larguraLogica, 0, alturaLogica, 0, 1);
+
+    // Realy needed?
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	// Coloque aqui as chamadas das rotinas que desenha os objetos
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+	// Axis
 	/*glPushMatrix();
         glColor3f(0,0,0);
         glLineWidth(10);
@@ -269,14 +321,20 @@ void display( void )
 	glPopMatrix();*/
 
     //DesenhaPisoParedes();
-
+    DesenhaCaixas();
     DesenhaRobo();
 
-    /*
-        Ponto p1 = {0,10,0};
-        Ponto p1_new;
-        CalculaPonto(p1,p1_new);
-    */
+    /*Ponto pa = {5, 10, 0}, pb = {0, 0, 0};
+    glColor3f(0.25, 0.75, 0.50);
+    glBegin(GL_QUADS);
+        glVertex2d(0,0);
+        glVertex2d(0,10);
+        glVertex2d(10,10);
+        glVertex2d(10,0);
+    glEnd();
+    CalculaPonto(pa, pb);
+    cout << "PA:(" << pa.x << ", " << pa.y << ", " << pa.z << ")" << endl;
+    cout << "PB:(" << pb.x << ", " << pb.y << ", " << pb.z << ")" << endl;*/
 
 	glutSwapBuffers();
 }
@@ -372,6 +430,7 @@ void CarregaCenario()
     CarregaObjeto("gameObjects/nivel2Robo.txt", 4);
     CarregaObjeto("gameObjects/nivel3Robo.txt", 5);
     CarregaObjeto("gameObjects/nivel4Robo.txt", 6);
+    CarregaObjeto("gameObjects/caixaAmarela.txt", 7);
 }
 
 // **********************************************************************
