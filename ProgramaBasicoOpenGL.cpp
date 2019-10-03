@@ -236,16 +236,15 @@ void DesenhaNivel4Robo()
 
     glTranslatef(0.0, objetos[5].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
     glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
-    a = {(objetos[6][0].size()/2.0), objetos[6][0].size(), 0.0};
+
+    a = {(objetos[6][0].size()/2.0), objetos[6].size(), 0.0};
 
     DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
 
-    glTranslated(0,15,0);
-    a = {0,0,0};
+    glTranslated((-1) * (objetos[6][0].size()/2.0),0,0);
+
     CalculaPonto(a, b);
     pontos[6] = b;
-
-
 
     cout << "A:(" << a.x << ", " << a.y << ")" << endl;
     cout << "B:(" << b.x << ", " << b.y << ")" << endl;
@@ -330,7 +329,7 @@ void display( void )
     DesenhaCaixas();
     DesenhaRobo();
 
-    glColor3f(1,1,0);
+    glColor3f(1,0,0);
     glBegin(GL_LINES);
         glVertex2d(0,0);
         glVertex2d(pontos[6].x, pontos[6].y);

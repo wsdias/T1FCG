@@ -191,13 +191,14 @@
 
 1298986600 /home/willian/Desktop/FCG/T1_Basico2D/GL/freeglut_ext.h
 
-1570067473 source:/home/willian/Desktop/T1FCG/ProgramaBasicoOpenGL.cpp
+1570137091 source:/home/willian/Desktop/T1FCG/ProgramaBasicoOpenGL.cpp
 	<iostream>
 	<fstream>
 	<string>
 	<cmath>
 	<ctime>
 	<vector>
+	<math.h>
 	<windows.h>
 	<glut.h>
 	<sys/time.h>
