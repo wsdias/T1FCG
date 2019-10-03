@@ -20,6 +20,7 @@
 #include <cmath>
 #include <ctime>
 #include <vector>
+#include <math.h>
 
 using namespace std;
 
@@ -47,9 +48,9 @@ typedef struct
 
 int larguraLogica = 192, alturaLogica = 108;
 float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
-vector<vector<vector<float>>> cores; // [objeto][cor][componente]
-vector<vector<vector<int>>> objetos; // [objeto][x][y]
-vector<vector<Ponto>> pontos; // [objeto][ponto]
+vector< vector< vector<float> > > cores; // [objeto][cor][componente]
+vector< vector< vector<int> > > objetos; // [objeto][x][y]
+vector<Ponto> pontos; // [objeto]
 
 void CalculaPonto(Ponto p, Ponto &out) {
 
@@ -69,24 +70,6 @@ void CalculaPonto(Ponto p, Ponto &out) {
     out.y = ponto_novo[1];
     out.z = ponto_novo[2];
 }
-
-int intersec2d(Ponto k, Ponto l, Ponto m, Ponto n, double &s, double &t)
-{
-    double det;
-
-    det = (n.x - m.x) * (l.y - k.y)  -  (n.y - m.y) * (l.x - k.x);
-
-    if (det == 0.0) return 0 ; // não há intersecção
-
-    cout << "s: " << ((n.x - m.x) * (m.y - k.y) - (n.y - m.y) * (m.x - k.x))/ det << endl;
-    cout << "t: " << ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det << endl;
-
-    //s = ((n.x - m.x) * (m.y - k.y) - (n.y - m.y) * (m.x - k.x))/ det ;
-    //t = ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det ;
-
-    return 1; // há intersecção
-}
-
 
 // **********************************************************************
 //  void animate ( unsigned char key, int x, int y )
@@ -209,7 +192,7 @@ void DesenhaObjeto(int index, float dx, float dy)
         for (j = 0; j < colunas; j++)
         {
             cor = objetos[index][i][j] - 1;
-            //glPushMatrix();
+            glPushMatrix();
             glColor3f(cores[index][cor][0], cores[index][cor][1], cores[index][cor][2]);
             glBegin(GL_QUADS);
                 glVertex2f(j-dx,i+dy);
@@ -217,154 +200,90 @@ void DesenhaObjeto(int index, float dx, float dy)
                 glVertex2f(j-dx+1,i+dy+1);
                 glVertex2f(j-dx+1,i+dy);
             glEnd();
-            //glPopMatrix();
+            glPopMatrix();
         }
     }
 }
 
 // -------------------------------------------------- //
 
-void CalcInterRoboCaixas()
-{
-    double *s, *t;
-    Ponto a = pontos[6][0], b = pontos[6][0],
-          c = pontos[7][0], d = pontos[7][0];
-
-    a.x -= 1.5; a.y += 0;
-    b.x += 1.5; b.y += 0;
-
-    c.x -= 4.5; c.y += 0;
-    d.x += 4.5; d.y += 0;
-
-    cout << "A(" << a.x << ", " << a.y << ")" << endl;
-    cout << "B(" << b.x << ", " << b.y << ")" << endl;
-
-    cout << "C(" << c.x << ", " << c.y << ")" << endl;
-    cout << "D(" << d.x << ", " << d.y << ")" << endl;
-
-    cout << "Intersec1: " << endl << intersec2d(a, b, c, d, *s, *t) << endl;
-
-    /* TESTE */
-    //Ponto k = {10, 5, 0}, l = {20, 4, 0}, m = {7, 6, 0}, n = {15, 4, 0};
-    //cout << "Intersec2: " << endl << intersec2d(k, l, m, n, *s, *t) << endl;
-
-    glPushMatrix();
-        glLineWidth(10);
-        glColor3f(0, 1, 0);
-        glBegin(GL_LINES);
-            glVertex2d(a.x, a.y);
-            glVertex2d(b.x, b.y);
-        glEnd();
-        glColor3f(1, 0, 0);
-        glBegin(GL_LINES);
-            glVertex2d(c.x, c.y);
-            glVertex2d(d.x, d.y);
-        glEnd();
-    glPopMatrix();
-}
-
-void DesenhaCaixa1()
-{
-    //Ponto a = {objetos[7][0].size()/2.0, objetos[7].size(), 0.0}, b;
-    Ponto a = {0, objetos[7].size(), 0.0}, b;
-
-    glPushMatrix();
-        //glTranslatef(larguraLogica/2.0 - 15.0, 0.0, 0.0);
-        //glTranslatef(4.5, 0.0, 0.0);
-        DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0);
-        CalculaPonto(a,b);
-        pontos[7][0] = b;
-        //cout << "(" << b.x << ", " << b.y << ")" << endl;
-    glPopMatrix();
-}
-
 void DesenhaCaixas()
 {
-    glPushMatrix();
-        glTranslatef(10.0, 0.0, 0.0);
-        DesenhaCaixa1();
-    glPopMatrix();
+    Ponto a, b;
+    int i;
+
+    for (i = 7; i < 8; i++)
+    {
+        a = {(objetos[i][0].size()/2.0), objetos[i][0].size(), 0.0};
+
+        DesenhaObjeto(i, 0.0, 0.0);
+
+        CalculaPonto(a, b);
+        //pontos[i] = b;
+
+        cout << "dist: " << sqrt(pow((pontos[6].x - b.x), 2) + pow((pontos[6].y - b.y), 2)) << endl;
+
+        cout << "Caixa " << i << " A:(" << a.x << ", " << a.y << ")" << endl;
+        cout << "Caixa " << i << " B:(" << b.x << ", " << b.y << ")" << endl;
+    }
 }
 
 // -------------------------------------------------- //
 
 void DesenhaNivel4Robo()
 {
-    glPushMatrix();
-        glTranslatef(0.0, objetos[5].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
+    Ponto a, b;
 
-        Ponto a = {0, objetos[6].size(), 0.0}, b;
+    glTranslatef(0.0, objetos[5].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
+    glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
+    a = {(objetos[6][0].size()/2.0), objetos[6][0].size(), 0.0};
 
-        glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
+    DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
 
-        DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+    glTranslated(0,15,0);
+    a = {0,0,0};
+    CalculaPonto(a, b);
+    pontos[6] = b;
 
-        // Tentar fazer com que a barra verde fique "grudada" na garra do robo (mesmas transformações)
-        //glTranslatef(objetos[6][0].size()/2.0, objetos[6].size(), 0.0);
-        //glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
-        //glTranslatef((-1) * (objetos[6][0].size()/2.0), (-1)*(objetos[6].size()/1.0), 0.0);
 
-        CalculaPonto(a,b);
-        cout << "### " << a.x << " , " << a.y << endl;
-        cout << "### " << b.x << " , " << b.y << endl;
-        pontos[6][0] = b;
 
-        //cout << "A:(" << a.x << ", " << a.y << ")" << endl;
-        //cout << "B:(" << b.x << ", " << b.y << ")" << endl;
-    glPopMatrix();
+    cout << "A:(" << a.x << ", " << a.y << ")" << endl;
+    cout << "B:(" << b.x << ", " << b.y << ")" << endl;
 }
 
 void DesenhaNivel3Robo()
 {
-    //Ponto a = {objetos[5][0].size()/2.0, objetos[5].size(), 0.0}, b;
-
-    glPushMatrix();
-        glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
-        glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
-        DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
-        DesenhaNivel4Robo();
-        //CalculaPonto(a,b);
-        //cout << "(" << b.x << ", " << b.y << ")" << endl;
-    glPopMatrix();
+    glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
+    glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
+    DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+    DesenhaNivel4Robo();
 }
 
 void DesenhaNivel2Robo()
 {
-    //Ponto a = {objetos[4][0].size()/2.0, objetos[4].size(), 0.0}, b;
-
-    glPushMatrix();
-        glTranslatef(0.0, objetos[3].size() - 2.0, 0.0); // Posiciona acima do nível, deslocando uma unidade abaixo (sobrepõe)
-        glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
-        DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
-        //CalculaPonto(a,b);
-        //cout << "(" << b.x << ", " << b.y << ")" << endl;
-        DesenhaNivel3Robo();
-    glPopMatrix();
+    glTranslatef(0.0, objetos[3].size() - 2.0, 0.0); // Posiciona acima do nível, deslocando uma unidade abaixo (sobrepõe)
+    glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
+    DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+    DesenhaNivel3Robo();
 }
 
 void DesenhaNivel1Robo()
 {
-    glPushMatrix();
-        glTranslatef(0.0, objetos[2].size(), 0.0); // Posiciona acima da base
-        DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0); // Desenha de forma centralizada (em relação ao SRO)
-        DesenhaNivel2Robo();
-    glPopMatrix();
+    glTranslatef(0.0, objetos[2].size(), 0.0); // Posiciona acima da base
+    DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0); // Desenha de forma centralizada (em relação ao SRO)
+    DesenhaNivel2Robo();
 }
 
 void DesenhaBaseRobo()
 {
-    glPushMatrix();
-        DesenhaObjeto(2, objetos[2][0].size()/2.0, 0.0);
-        DesenhaNivel1Robo();
-    glPopMatrix();
+    DesenhaObjeto(2, objetos[2][0].size()/2.0, 0.0);
+    DesenhaNivel1Robo();
 }
 
 void DesenhaRobo()
 {
     glPushMatrix();
-        glTranslatef(baseDx, baseDy, 0.0); // Movimenta em relação ao universo
-        //glTranslatef(larguraLogica/2.0, 0.0, 0.0); // Posicina em relação universo
-        glTranslatef(40.0, 0.0, 0.0); // Posicina em relação universo
+        glTranslatef(baseDx + (larguraLogica/2.0), baseDy, 0.0); // Posicina e movimenta em relação universo
         DesenhaBaseRobo();
     glPopMatrix();
 }
@@ -394,7 +313,7 @@ void display( void )
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	// Axis
-	glPushMatrix();
+	/*glPushMatrix();
         glColor3f(0,0,0);
         glLineWidth(10);
         glBegin(GL_LINES);
@@ -405,28 +324,19 @@ void display( void )
             glVertex2d(0, alturaLogica/2.0);
             glVertex2d(larguraLogica, alturaLogica/2.0);
         glEnd();
-	glPopMatrix();
+	glPopMatrix();*/
 
     //DesenhaPisoParedes();
     DesenhaCaixas();
     DesenhaRobo();
 
-    cout << endl;
-    //for (int i = 0; i < 8; i++) cout << "P" << i << ": (" << pontos[i][0].x  << ", " << pontos[i][0].y << ")" << endl;
-    CalcInterRoboCaixas();
-    cout << endl;
-
-    /*Ponto pa = {5, 10, 0}, pb = {0, 0, 0};
-    glColor3f(0.25, 0.75, 0.50);
-    glBegin(GL_QUADS);
+    glColor3f(1,1,0);
+    glBegin(GL_LINES);
         glVertex2d(0,0);
-        glVertex2d(0,10);
-        glVertex2d(10,10);
-        glVertex2d(10,0);
+        glVertex2d(pontos[6].x, pontos[6].y);
     glEnd();
-    CalculaPonto(pa, pb);
-    cout << "PA:(" << pa.x << ", " << pa.y << ", " << pa.z << ")" << endl;
-    cout << "PB:(" << pb.x << ", " << pb.y << ", " << pb.z << ")" << endl;*/
+
+    //for (int i = 0; i < 8; i++) cout << "P" << i << ": (" << pontos[i][0].x  << ", " << pontos[i][0].y << ")" << endl;
 
 	glutSwapBuffers();
 }
@@ -529,8 +439,7 @@ void CarregaCenario()
     for (i = 0; i < 8; i++)
     {
         pontos.resize(pontos.size()+1);
-        pontos[i].resize(1);
-        pontos[i][0] = {0, 0, 0};
+        pontos[i] = {0, 0, 0};
     }
 }
 
