@@ -78,8 +78,11 @@ int intersec2d(Ponto k, Ponto l, Ponto m, Ponto n, double &s, double &t)
 
     if (det == 0.0) return 0 ; // não há intersecção
 
-    s = ((n.x - m.x) * (m.y - k.y) - (n.y - m.y) * (m.x - k.x))/ det ;
-    t = ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det ;
+    cout << "s: " << ((n.x - m.x) * (m.y - k.y) - (n.y - m.y) * (m.x - k.x))/ det << endl;
+    cout << "t: " << ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det << endl;
+
+    //s = ((n.x - m.x) * (m.y - k.y) - (n.y - m.y) * (m.x - k.x))/ det ;
+    //t = ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det ;
 
     return 1; // há intersecção
 }
@@ -227,26 +230,27 @@ void CalcInterRoboCaixas()
     Ponto a = pontos[6][0], b = pontos[6][0],
           c = pontos[7][0], d = pontos[7][0];
 
-    //a.x -= objetos[6][0].size(); a.y += 1;
-    a.x -= objetos[6][0].size(); a.y += 0;
-    b.x += 0; b.y += 0;
+    a.x -= 1; //a.y += 1;
+    b.x += 1; //b.y += 1;
 
-    c.x -= 0.5; c.y += 0;
-    d.x += 0.5; d.y += 0;
+    c.x -= 4; c.y += 0;
+    d.x += 4; d.y += 0;
 
     cout << "A(" << a.x << ", " << a.y << ")" << endl;
     cout << "B(" << b.x << ", " << b.y << ")" << endl;
 
-    //cout << "C(" << c.x << ", " << c.y << ")" << endl;
-    //cout << "D(" << d.x << ", " << d.y << ")" << endl;
+    cout << "C(" << c.x << ", " << c.y << ")" << endl;
+    cout << "D(" << d.x << ", " << d.y << ")" << endl;
 
-    //cout << intersec2d(a, b, c, d, *s, *t) << endl;
+    cout << "Intersec1: " << endl << intersec2d(a, b, c, d, *s, *t) << endl;
+
+    /* TESTE */
+    Ponto k = {10, 5, 0}, l = {20, 4, 0}, m = {7, 6, 0}, n = {15, 4, 0};
+    cout << "Intersec2: " << endl << intersec2d(k, l, m, n, *s, *t) << endl;
 
     glPushMatrix();
         glLineWidth(10);
         glColor3f(0, 1, 0);
-        //glRotatef(rotacaoN2,0,0,1);
-        //glRotatef(rotacaoN4,0,0,1);
         glBegin(GL_LINES);
             glVertex2d(a.x, a.y);
             glVertex2d(b.x, b.y);
@@ -261,7 +265,8 @@ void CalcInterRoboCaixas()
 
 void DesenhaCaixa1()
 {
-    Ponto a = {objetos[7][0].size()/2.0, objetos[7].size(), 0.0}, b;
+    //Ponto a = {objetos[7][0].size()/2.0, objetos[7].size(), 0.0}, b;
+    Ponto a = {0, objetos[7].size(), 0.0}, b;
 
     glPushMatrix();
         //glTranslatef(larguraLogica/2.0 - 15.0, 0.0, 0.0);
@@ -276,7 +281,7 @@ void DesenhaCaixa1()
 void DesenhaCaixas()
 {
     glPushMatrix();
-        //glTranslatef(0.0, , 0.0);
+        glTranslatef(10.0, 0.0, 0.0);
         DesenhaCaixa1();
     glPopMatrix();
 }
@@ -285,16 +290,23 @@ void DesenhaCaixas()
 
 void DesenhaNivel4Robo()
 {
-    Ponto a = {objetos[6][0].size()/2.0, objetos[6].size(), 0.0}, b;
+    //Ponto a = {objetos[6][0].size()/2.0, objetos[6].size(), 0.0}, b;
+    //Ponto a = {0, objetos[6].size(), 0.0}, b;
 
     glPushMatrix();
         glTranslatef(0.0, objetos[5].size() - 1.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
         glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
+        Ponto a = {0, objetos[6].size(), 0.0}, b;
         DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+
+        glTranslatef(objetos[6][0].size()/2.0, 15.0, 0.0);
+        glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
+        glTranslatef(-(objetos[6][0].size()/2.0), -15.0, 0.0);
+
         CalculaPonto(a,b);
         pontos[6][0] = b;
-        cout << "A:(" << a.x << ", " << a.y << ")" << endl;
-        cout << "B:(" << b.x << ", " << b.y << ")" << endl;
+        //cout << "A:(" << a.x << ", " << a.y << ")" << endl;
+        //cout << "B:(" << b.x << ", " << b.y << ")" << endl;
     glPopMatrix();
 }
 
@@ -348,7 +360,7 @@ void DesenhaRobo()
     glPushMatrix();
         glTranslatef(baseDx, baseDy, 0.0); // Movimenta em relação ao universo
         //glTranslatef(larguraLogica/2.0, 0.0, 0.0); // Posicina em relação universo
-        glTranslatef(15, 0.0, 0.0); // Posicina em relação universo
+        glTranslatef(40.0, 0.0, 0.0); // Posicina em relação universo
         DesenhaBaseRobo();
     glPopMatrix();
 }
