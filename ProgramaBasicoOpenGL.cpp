@@ -230,11 +230,11 @@ void CalcInterRoboCaixas()
     Ponto a = pontos[6][0], b = pontos[6][0],
           c = pontos[7][0], d = pontos[7][0];
 
-    a.x -= 1; //a.y += 1;
-    b.x += 1; //b.y += 1;
+    a.x -= 1.5; a.y += 0;
+    b.x += 1.5; b.y += 0;
 
-    c.x -= 4; c.y += 0;
-    d.x += 4; d.y += 0;
+    c.x -= 4.5; c.y += 0;
+    d.x += 4.5; d.y += 0;
 
     cout << "A(" << a.x << ", " << a.y << ")" << endl;
     cout << "B(" << b.x << ", " << b.y << ")" << endl;
@@ -245,8 +245,8 @@ void CalcInterRoboCaixas()
     cout << "Intersec1: " << endl << intersec2d(a, b, c, d, *s, *t) << endl;
 
     /* TESTE */
-    Ponto k = {10, 5, 0}, l = {20, 4, 0}, m = {7, 6, 0}, n = {15, 4, 0};
-    cout << "Intersec2: " << endl << intersec2d(k, l, m, n, *s, *t) << endl;
+    //Ponto k = {10, 5, 0}, l = {20, 4, 0}, m = {7, 6, 0}, n = {15, 4, 0};
+    //cout << "Intersec2: " << endl << intersec2d(k, l, m, n, *s, *t) << endl;
 
     glPushMatrix();
         glLineWidth(10);
@@ -290,21 +290,25 @@ void DesenhaCaixas()
 
 void DesenhaNivel4Robo()
 {
-    //Ponto a = {objetos[6][0].size()/2.0, objetos[6].size(), 0.0}, b;
-    //Ponto a = {0, objetos[6].size(), 0.0}, b;
-
     glPushMatrix();
-        glTranslatef(0.0, objetos[5].size() - 1.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
-        glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
+        glTranslatef(0.0, objetos[5].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
+
         Ponto a = {0, objetos[6].size(), 0.0}, b;
+
+        glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
+
         DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
 
-        glTranslatef(objetos[6][0].size()/2.0, 15.0, 0.0);
-        glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
-        glTranslatef(-(objetos[6][0].size()/2.0), -15.0, 0.0);
+        // Tentar fazer com que a barra verde fique "grudada" na garra do robo (mesmas transformações)
+        //glTranslatef(objetos[6][0].size()/2.0, objetos[6].size(), 0.0);
+        //glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
+        //glTranslatef((-1) * (objetos[6][0].size()/2.0), (-1)*(objetos[6].size()/1.0), 0.0);
 
         CalculaPonto(a,b);
+        cout << "### " << a.x << " , " << a.y << endl;
+        cout << "### " << b.x << " , " << b.y << endl;
         pontos[6][0] = b;
+
         //cout << "A:(" << a.x << ", " << a.y << ")" << endl;
         //cout << "B:(" << b.x << ", " << b.y << ")" << endl;
     glPopMatrix();
@@ -407,8 +411,10 @@ void display( void )
     DesenhaCaixas();
     DesenhaRobo();
 
-    for (int i = 0; i < 8; i++) cout << "P" << i << ": (" << pontos[i][0].x  << ", " << pontos[i][0].y << ")" << endl;
+    cout << endl;
+    //for (int i = 0; i < 8; i++) cout << "P" << i << ": (" << pontos[i][0].x  << ", " << pontos[i][0].y << ")" << endl;
     CalcInterRoboCaixas();
+    cout << endl;
 
     /*Ponto pa = {5, 10, 0}, pb = {0, 0, 0};
     glColor3f(0.25, 0.75, 0.50);
