@@ -319,18 +319,31 @@ void DesenhaBaseRobo()
 
 void DesenhaRobo()
 {
+    Ponto a, b, c, d, centroLocal, centroUniverso;
+
     glPushMatrix();
 
-        glPushMatrix();
-            glColor3f(1,0,0);
-            glBegin(GL_LINES);
-                glVertex2d(0,0);
-                glVertex2d(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy);
-            glEnd();
-        glPopMatrix();
-
         glTranslatef(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy, 0.0); // Posicina e movimenta em relação universo
+        centroLocal = {(objetos[3][0].size()/2.0), (objetos[3].size()/2.0), 0.0};
         DesenhaBaseRobo();
+
+        CalculaPonto(centroLocal, centroUniverso);
+
+        a = b = c = d = centroUniverso;
+        a.x -= (objetos[3][0].size()/2.0); a.y -= (objetos[3].size()/2.0);
+        b.x -= (objetos[3][0].size()/2.0); b.y += (objetos[3].size()/2.0);
+        c.x += (objetos[3][0].size()/2.0); c.y += (objetos[3].size()/2.0);
+        d.x += (objetos[3][0].size()/2.0); d.y -= (objetos[3].size()/2.0);
+
+
+        cout << "CentroLocal:(" << centroLocal.x << ", " << centroLocal.y << ")" << endl;
+        cout << "CentroUniverso:(" << centroUniverso.x << ", " << centroUniverso.y << ")" << endl;
+        cout << "A(" << a.x << ", " << a.y << ")" << endl;
+        cout << "B(" << b.x << ", " << b.y << ")" << endl;
+        cout << "C(" << c.x << ", " << c.y << ")" << endl;
+        cout << "D(" << d.x << ", " << d.y << ")" << endl;
+        cout << endl;
+
     glPopMatrix();
 }
 
