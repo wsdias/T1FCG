@@ -1,4 +1,12 @@
 // **********************************************************************
+//
+//  T1 - Fundamentos de ComputaÁ„o Gr·fica
+//
+//  Willian Schmiele Dias
+//
+//  2019/2
+//
+// **********************************************************************
 // PUCRS/Escola Politécnica
 // COMPUTAÇÃO GRÁFICA
 //
@@ -46,11 +54,17 @@ typedef struct
     GLfloat x, y, z;
 } Ponto;
 
-int larguraLogica = 192, alturaLogica = 108;
+typedef struct{
+    float x, y;
+} Instancia;
+
+bool podeMover = false;
+int larguraLogica = 192, alturaLogica = 108, numObjetos = 9, segurando = -1;
 float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
 vector< vector< vector<float> > > cores; // [objeto][cor][componente]
 vector< vector< vector<int> > > objetos; // [objeto][x][y]
-vector<Ponto> pontos; // [objeto]
+vector<Instancia> deslocamento; // [objetos][x][y]
+vector<Ponto> pa, pb; // [objeto]
 
 void CalculaPonto(Ponto p, Ponto &out) {
 
@@ -158,7 +172,11 @@ void CarregaObjeto(string diretorio, int index)
     {
         arquivo >> conteudo;
         cores[index][i].resize(3);
-        for (j = 0; j < 3; j++) arquivo >> cores[index][i][j];
+        for (j = 0; j < 3; j++)
+        {
+            arquivo >> cores[index][i][j];
+            cores[index][i][j] /= 255.0;
+        }
     }
 
     arquivo >> conteudo;
@@ -210,22 +228,54 @@ void DesenhaObjeto(int index, float dx, float dy)
 void DesenhaCaixas()
 {
     Ponto a, b;
-    int i;
+    int i, movimentar;
+    double dist;
 
-    for (i = 7; i < 8; i++)
+
+    for (i = 7; i < numObjetos; i++)
     {
-        a = {(objetos[i][0].size()/2.0), objetos[i][0].size(), 0.0};
-
-        DesenhaObjeto(i, 0.0, 0.0);
-
-        CalculaPonto(a, b);
-        //pontos[i] = b;
-
-        cout << "dist: " << sqrt(pow((pontos[6].x - b.x), 2) + pow((pontos[6].y - b.y), 2)) << endl;
-
-        cout << "Caixa " << i << " A:(" << a.x << ", " << a.y << ")" << endl;
-        cout << "Caixa " << i << " B:(" << b.x << ", " << b.y << ")" << endl;
+        if (i != segurando)
+        {
+            glPushMatrix();
+                glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
+                a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
+                CalculaPonto(a, b);
+                pa[i] = a;
+                pb[i] = b;
+                DesenhaObjeto(i, 0.0, 0.0);
+            glPopMatrix();
+        }
     }
+
+    /*if (!podeMover)
+    {
+        for (i = 7; i < numObjetos; i++)
+        {
+            //a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
+            DesenhaObjeto(i, 0.0, 0.0);
+        }
+    }
+    else
+    {
+        for (i = 7; i < numObjetos; i++)
+        {
+            a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
+            CalculaPonto(a, b);
+            pb[i] = b;
+            dist = sqrt(pow((pb[6].x - b.x), 2) + pow((pb[6].y - b.y), 2));
+            if (dist < a.x + 1) movimentar = i;
+        }
+
+        for (i = 7; i < numObjetos; i++)
+        {
+            if (i != movimentar) DesenhaObjeto(i, 0.0, 0.0);
+            else
+            {
+                cout << baseDx << " ; " << baseDy << endl;
+                DesenhaObjeto(i, 5, 0.0);
+            }
+        }
+    }*/
 }
 
 // -------------------------------------------------- //
@@ -244,10 +294,17 @@ void DesenhaNivel4Robo()
     glTranslated((-1) * (objetos[6][0].size()/2.0),0,0);
 
     CalculaPonto(a, b);
-    pontos[6] = b;
+    pa[6] = a;
+    pb[6] = b;
 
-    cout << "A:(" << a.x << ", " << a.y << ")" << endl;
-    cout << "B:(" << b.x << ", " << b.y << ")" << endl;
+    if (segurando != -1)
+    {
+        //deslocamento[segurando].x
+        DesenhaObjeto(segurando, a.x, a.y);
+    }
+
+    //cout << "A:(" << a.x << ", " << a.y << ")" << endl;
+    //cout << "B:(" << b.x << ", " << b.y << ")" << endl;
 }
 
 void DesenhaNivel3Robo()
@@ -332,10 +389,16 @@ void display( void )
     glColor3f(1,0,0);
     glBegin(GL_LINES);
         glVertex2d(0,0);
-        glVertex2d(pontos[6].x, pontos[6].y);
+        glVertex2d(pb[6].x, pb[6].y);
     glEnd();
 
-    //for (int i = 0; i < 8; i++) cout << "P" << i << ": (" << pontos[i][0].x  << ", " << pontos[i][0].y << ")" << endl;
+    /*glColor3f(0,1,0);
+    glBegin(GL_LINES);
+        glVertex2d(0,0);
+        glVertex2d(pb[7].x, pb[7].y);
+    glEnd();*/
+
+    //for (int i = 0; i < numObjetos; i++) cout << "P" << i << ": (" << pb[i][0].x  << ", " << pb[i][0].y << ")" << endl;
 
 	glutSwapBuffers();
 }
@@ -383,6 +446,26 @@ void keyboard ( unsigned char key, int x, int y )
         case 'x':
             rotacaoN2 -= rotacaoN2 > -45 ? 5 : 0;
             //cout << rotacaoN2 << endl;
+            break;
+
+        case ' ':
+            podeMover = !podeMover;
+            if (!podeMover) segurando = -1;
+
+            Ponto a, b;
+            int i;
+            float dist
+;            for (i = 7; i < numObjetos; i++)
+            {
+                cout << "ROBO: |  A(" << pa[6].x << ", " << pa[6].y << ")" << endl;
+                cout << "ROBO: |  B(" << pb[6].x << ", " << pb[6].y << ")" << endl;
+                cout << "A_I: " << i << "  |  A(" << pa[i].x << ", " << pa[i].y << ")" << endl;
+                cout << "B_I: " << i << "  |  B(" << pb[i].x << ", " << pb[i].y << ")" << endl;
+
+                dist = sqrt(pow((pb[6].x - pb[i].x), 2) + pow((pb[6].y - pb[i].y), 2));
+                if (dist < pa[i].x + 1) segurando = i;
+                cout << segurando << endl << endl;
+            }
             break;
 
 		default:
@@ -434,12 +517,19 @@ void CarregaCenario()
     CarregaObjeto("gameObjects/nivel3Robo.txt", 5);
     CarregaObjeto("gameObjects/nivel4Robo.txt", 6);
     CarregaObjeto("gameObjects/caixaAmarela.txt", 7);
+    CarregaObjeto("gameObjects/caixaVerde.txt", 8);
 
-    for (i = 0; i < 8; i++)
-    {
-        pontos.resize(pontos.size()+1);
-        pontos[i] = {0, 0, 0};
-    }
+    pa.resize(numObjetos+1);
+    pb.resize(numObjetos+1);
+    deslocamento.resize(numObjetos+1);
+
+    // Caixas
+    deslocamento[7].x = 5; deslocamento[7].y = 5;
+    deslocamento[8].x = 25; deslocamento[8].y = 10;
+
+
+    for (i = 0; i < numObjetos; i++) pa[i] = {0, 0, 0};
+    for (i = 0; i < numObjetos; i++) pb[i] = {0, 0, 0};
 }
 
 // **********************************************************************
