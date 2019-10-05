@@ -59,11 +59,12 @@ typedef struct{
 } Instancia;
 
 bool podeMover = false;
-int larguraLogica = 192, alturaLogica = 108, numObjetos = 9, segurando = -1;
+int larguraLogica = 192, alturaLogica = 108, segurando = -1, numObjetos = 0;
 float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
+
 vector< vector< vector<float> > > cores; // [objeto][cor][componente]
 vector< vector< vector<int> > > objetos; // [objeto][x][y]
-vector<Instancia> deslocamento; // [objetos][x][y]
+vector<Instancia> deslocamento; // [objetos]
 vector<Ponto> pa, pb; // [objeto]
 
 void CalculaPonto(Ponto p, Ponto &out) {
@@ -154,6 +155,8 @@ void reshape( int w, int h )
     //glOrtho((-1)*larguraLogica,larguraLogica,(-1)*alturaLogica,alturaLogica,0,1);
 }
 
+// -------------------------------------------------- //
+
 void CarregaObjeto(string diretorio, int index)
 {
     int i, j, cor, nCores, linhas, colunas;
@@ -198,6 +201,8 @@ void CarregaObjeto(string diretorio, int index)
     arquivo.close();
 }
 
+// -------------------------------------------------- //
+
 void DesenhaObjeto(int index, float dx, float dy)
 {
     int i, j, linhas, colunas, cor;
@@ -228,11 +233,9 @@ void DesenhaObjeto(int index, float dx, float dy)
 void DesenhaCaixas()
 {
     Ponto a, b;
-    int i, movimentar;
-    double dist;
+    int i;
 
-
-    for (i = 7; i < numObjetos; i++)
+    for (i = 8; i < numObjetos; i++)
     {
         if (i != segurando)
         {
@@ -246,36 +249,6 @@ void DesenhaCaixas()
             glPopMatrix();
         }
     }
-
-    /*if (!podeMover)
-    {
-        for (i = 7; i < numObjetos; i++)
-        {
-            //a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
-            DesenhaObjeto(i, 0.0, 0.0);
-        }
-    }
-    else
-    {
-        for (i = 7; i < numObjetos; i++)
-        {
-            a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
-            CalculaPonto(a, b);
-            pb[i] = b;
-            dist = sqrt(pow((pb[6].x - b.x), 2) + pow((pb[6].y - b.y), 2));
-            if (dist < a.x + 1) movimentar = i;
-        }
-
-        for (i = 7; i < numObjetos; i++)
-        {
-            if (i != movimentar) DesenhaObjeto(i, 0.0, 0.0);
-            else
-            {
-                cout << baseDx << " ; " << baseDy << endl;
-                DesenhaObjeto(i, 5, 0.0);
-            }
-        }
-    }*/
 }
 
 // -------------------------------------------------- //
@@ -284,22 +257,23 @@ void DesenhaNivel4Robo()
 {
     Ponto a, b;
 
-    glTranslatef(0.0, objetos[5].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
+    glTranslatef(0.0, objetos[6].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
     glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
 
-    a = {(objetos[6][0].size()/2.0), objetos[6].size(), 0.0};
+    a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
 
-    DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+    DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
 
-    glTranslated((-1) * (objetos[6][0].size()/2.0),0,0);
+    glTranslated((-1) * (objetos[7][0].size()/2.0),0,0);
 
     CalculaPonto(a, b);
-    pa[6] = a;
-    pb[6] = b;
+    pa[7] = a;
+    pb[7] = b;
 
     if (segurando != -1)
     {
-        //deslocamento[segurando].x
+        deslocamento[segurando].x = b.x;
+        deslocamento[segurando].y = b.y;
         DesenhaObjeto(segurando, a.x, a.y);
     }
 
@@ -307,41 +281,66 @@ void DesenhaNivel4Robo()
     //cout << "B:(" << b.x << ", " << b.y << ")" << endl;
 }
 
+// -------------------------------------------------- //
+
 void DesenhaNivel3Robo()
 {
-    glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
+    glTranslatef(0.0, objetos[5].size() - 2.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
     glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
-    DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+    DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
     DesenhaNivel4Robo();
 }
 
+// -------------------------------------------------- //
+
 void DesenhaNivel2Robo()
 {
-    glTranslatef(0.0, objetos[3].size() - 2.0, 0.0); // Posiciona acima do nível, deslocando uma unidade abaixo (sobrepõe)
+    glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona acima do nível, deslocando uma unidade abaixo (sobrepõe)
     glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
-    DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+    DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
     DesenhaNivel3Robo();
 }
 
+// -------------------------------------------------- //
+
 void DesenhaNivel1Robo()
 {
-    glTranslatef(0.0, objetos[2].size(), 0.0); // Posiciona acima da base
-    DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0); // Desenha de forma centralizada (em relação ao SRO)
+    glTranslatef(0.0, objetos[3].size(), 0.0); // Posiciona acima da base
+    DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Desenha de forma centralizada (em relação ao SRO)
     DesenhaNivel2Robo();
 }
 
+// -------------------------------------------------- //
+
 void DesenhaBaseRobo()
 {
-    DesenhaObjeto(2, objetos[2][0].size()/2.0, 0.0);
+    DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0);
     DesenhaNivel1Robo();
 }
+
+// -------------------------------------------------- //
 
 void DesenhaRobo()
 {
     glPushMatrix();
-        glTranslatef(baseDx + (larguraLogica/2.0), baseDy, 0.0); // Posicina e movimenta em relação universo
+        glTranslatef(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy, 0.0); // Posicina e movimenta em relação universo
         DesenhaBaseRobo();
     glPopMatrix();
+}
+
+// -------------------------------------------------- //
+
+void DesenhaPisoParedes()
+{
+    int i;
+
+    for (i = 0; i < 2; i++)
+    {
+        glPushMatrix();
+            glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
+            DesenhaObjeto(i, 0.0, 0.0);
+        glPopMatrix();
+    }
 }
 
 
@@ -382,23 +381,15 @@ void display( void )
         glEnd();
 	glPopMatrix();*/
 
-    //DesenhaPisoParedes();
+    DesenhaPisoParedes();
     DesenhaCaixas();
     DesenhaRobo();
 
     glColor3f(1,0,0);
     glBegin(GL_LINES);
         glVertex2d(0,0);
-        glVertex2d(pb[6].x, pb[6].y);
-    glEnd();
-
-    /*glColor3f(0,1,0);
-    glBegin(GL_LINES);
-        glVertex2d(0,0);
         glVertex2d(pb[7].x, pb[7].y);
-    glEnd();*/
-
-    //for (int i = 0; i < numObjetos; i++) cout << "P" << i << ": (" << pb[i][0].x  << ", " << pb[i][0].y << ")" << endl;
+    glEnd();
 
 	glutSwapBuffers();
 }
@@ -449,21 +440,23 @@ void keyboard ( unsigned char key, int x, int y )
             break;
 
         case ' ':
+            Ponto a, b;
+            int i;
+            float dist;
+
             podeMover = !podeMover;
             if (!podeMover) segurando = -1;
 
-            Ponto a, b;
-            int i;
-            float dist
-;            for (i = 7; i < numObjetos; i++)
+            for (i = 8; i < numObjetos; i++)
             {
-                cout << "ROBO: |  A(" << pa[6].x << ", " << pa[6].y << ")" << endl;
-                cout << "ROBO: |  B(" << pb[6].x << ", " << pb[6].y << ")" << endl;
+                cout << "ROBO: |  A(" << pa[7].x << ", " << pa[7].y << ")" << endl;
+                cout << "ROBO: |  B(" << pb[7].x << ", " << pb[7].y << ")" << endl;
                 cout << "A_I: " << i << "  |  A(" << pa[i].x << ", " << pa[i].y << ")" << endl;
                 cout << "B_I: " << i << "  |  B(" << pb[i].x << ", " << pb[i].y << ")" << endl;
 
-                dist = sqrt(pow((pb[6].x - pb[i].x), 2) + pow((pb[6].y - pb[i].y), 2));
+                dist = sqrt(pow((pb[7].x - pb[i].x), 2) + pow((pb[7].y - pb[i].y), 2));
                 if (dist < pa[i].x + 1) segurando = i;
+
                 cout << segurando << endl << endl;
             }
             break;
@@ -505,31 +498,55 @@ void arrow_keys ( int a_keys, int x, int y )
 	}
 }
 
+// -------------------------------------------------- //
+
 void CarregaCenario()
 {
     int i;
 
+    // Piso e paredes
     CarregaObjeto("gameObjects/piso.txt", 0);
     CarregaObjeto("gameObjects/paredes.txt", 1);
-    CarregaObjeto("gameObjects/baseRobo.txt", 2);
-    CarregaObjeto("gameObjects/nivel1Robo.txt", 3);
-    CarregaObjeto("gameObjects/nivel2Robo.txt", 4);
-    CarregaObjeto("gameObjects/nivel3Robo.txt", 5);
-    CarregaObjeto("gameObjects/nivel4Robo.txt", 6);
-    CarregaObjeto("gameObjects/caixaAmarela.txt", 7);
-    CarregaObjeto("gameObjects/caixaVerde.txt", 8);
+    CarregaObjeto("gameObjects/paredes.txt", 2);
+
+    // Robo
+    CarregaObjeto("gameObjects/baseRobo.txt", 3);
+    CarregaObjeto("gameObjects/nivel1Robo.txt", 4);
+    CarregaObjeto("gameObjects/nivel2Robo.txt", 5);
+    CarregaObjeto("gameObjects/nivel3Robo.txt", 6);
+    CarregaObjeto("gameObjects/nivel4Robo.txt", 7);
+
+    // Caixas
+    CarregaObjeto("gameObjects/caixaAmarela.txt", 8);
+    CarregaObjeto("gameObjects/caixaVerde.txt", 9);
+
+    numObjetos = 10;
 
     pa.resize(numObjetos+1);
     pb.resize(numObjetos+1);
     deslocamento.resize(numObjetos+1);
 
-    // Caixas
-    deslocamento[7].x = 5; deslocamento[7].y = 5;
-    deslocamento[8].x = 25; deslocamento[8].y = 10;
-
-
     for (i = 0; i < numObjetos; i++) pa[i] = {0, 0, 0};
     for (i = 0; i < numObjetos; i++) pb[i] = {0, 0, 0};
+}
+
+// -------------------------------------------------- //
+
+void DefinirPropriedades()
+{
+    //deslocamento[].x = ; deslocamento[].y = ;
+
+    // Cenário (piso e paredes)
+    deslocamento[0].x = 0; deslocamento[0].y = 0;
+    deslocamento[1].x = 0; deslocamento[1].y = objetos[0].size();
+    deslocamento[2].x = larguraLogica - objetos[2][0].size(); deslocamento[2].y = objetos[0].size();
+
+    // Robo
+    deslocamento[3].x = larguraLogica/2.0; deslocamento[3].y = objetos[0].size();
+
+    // Caixas
+    deslocamento[8].x = 15; deslocamento[8].y = objetos[0].size();
+    deslocamento[9].x = 10; deslocamento[9].y = objetos[0].size();
 }
 
 // **********************************************************************
@@ -541,6 +558,7 @@ int  main ( int argc, char** argv )
 {
     // Carrega objetos
     CarregaCenario();
+    DefinirPropriedades();
 
     glutInit            ( &argc, argv );
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB );
