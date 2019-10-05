@@ -235,17 +235,17 @@ void DesenhaCaixas()
     Ponto a, b;
     int i;
 
-    for (i = 8; i < numObjetos; i++)
+    for (i = 14; i < numObjetos; i++)
     {
         if (i != segurando)
         {
             glPushMatrix();
                 glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
                 a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
+                DesenhaObjeto(i, 0.0, 0.0);
                 CalculaPonto(a, b);
                 pa[i] = a;
                 pb[i] = b;
-                DesenhaObjeto(i, 0.0, 0.0);
             glPopMatrix();
         }
     }
@@ -276,9 +276,6 @@ void DesenhaNivel4Robo()
         deslocamento[segurando].y = b.y;
         DesenhaObjeto(segurando, a.x, a.y);
     }
-
-    //cout << "A:(" << a.x << ", " << a.y << ")" << endl;
-    //cout << "B:(" << b.x << ", " << b.y << ")" << endl;
 }
 
 // -------------------------------------------------- //
@@ -323,6 +320,15 @@ void DesenhaBaseRobo()
 void DesenhaRobo()
 {
     glPushMatrix();
+
+        glPushMatrix();
+            glColor3f(1,0,0);
+            glBegin(GL_LINES);
+                glVertex2d(0,0);
+                glVertex2d(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy);
+            glEnd();
+        glPopMatrix();
+
         glTranslatef(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy, 0.0); // Posicina e movimenta em relação universo
         DesenhaBaseRobo();
     glPopMatrix();
@@ -330,16 +336,75 @@ void DesenhaRobo()
 
 // -------------------------------------------------- //
 
-void DesenhaPisoParedes()
+void DesenhaPisoParedesPrateleiras()
 {
+    Ponto a, b;
     int i;
 
-    for (i = 0; i < 2; i++)
+    // Piso e paredes
+    for (i = 0; i < 3; i++)
     {
         glPushMatrix();
             glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
+            a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
             DesenhaObjeto(i, 0.0, 0.0);
+            CalculaPonto(a, b);
+            pa[i] = a;
+            pb[i] = b;
         glPopMatrix();
+    }
+
+    // Prateleiras
+    for (i = 8; i < 14; i++)
+    {
+        glPushMatrix();
+            glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
+            a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
+            DesenhaObjeto(i, 0.0, 0.0);
+            CalculaPonto(a, b);
+            pa[i] = a;
+            pb[i] = b;
+        glPopMatrix();
+    }
+}
+
+// -------------------------------------------------- //
+
+void VerificarSePodeMover()
+{
+    int i, j;
+
+    for (i = 0; i < numObjetos; i++)
+    {
+        for (j = 0; j < numObjetos; j++)
+        {
+            if (i != j)
+            {
+
+            }
+        }
+    }
+}
+
+// -------------------------------------------------- //
+
+void VerificarSePodePegar()
+{
+    Ponto a, b;
+    int i;
+    float dist;
+
+    for (i = 14; i < numObjetos; i++)
+    {
+        cout << "ROBO: |  A(" << pa[7].x << ", " << pa[7].y << ")" << endl;
+        cout << "ROBO: |  B(" << pb[7].x << ", " << pb[7].y << ")" << endl;
+        cout << "A_I: " << i << "  |  A(" << pa[i].x << ", " << pa[i].y << ")" << endl;
+        cout << "B_I: " << i << "  |  B(" << pb[i].x << ", " << pb[i].y << ")" << endl;
+
+        dist = sqrt(pow((pb[7].x - pb[i].x), 2) + pow((pb[7].y - pb[i].y), 2));
+        if (dist < pa[i].x + 1) segurando = i;
+
+        cout << segurando << endl << endl;
     }
 }
 
@@ -381,15 +446,24 @@ void display( void )
         glEnd();
 	glPopMatrix();*/
 
-    DesenhaPisoParedes();
+    DesenhaPisoParedesPrateleiras();
     DesenhaCaixas();
     DesenhaRobo();
+
+    VerificarSePodeMover();
 
     glColor3f(1,0,0);
     glBegin(GL_LINES);
         glVertex2d(0,0);
         glVertex2d(pb[7].x, pb[7].y);
     glEnd();
+
+    /*for (int i = 0; i < numObjetos; i++)
+    {
+        cout << i << "\tPA:(" << pa[i].x << ", " << pa[i].y << ")" << endl;
+        cout << "\tPB:(" << pb[i].x << ", " << pb[i].y << ")" << endl;
+        cout << endl;
+    }*/
 
 	glutSwapBuffers();
 }
@@ -410,55 +484,39 @@ void keyboard ( unsigned char key, int x, int y )
 			break;
 
         case 'q':
-            rotacaoN4 += rotacaoN4 < 90 ? 5 : 0;
+            rotacaoN4 += rotacaoN4 < 90 ? 15 : 0;
             //cout << rotacaoN4 << endl;
             break;
 
         case 'w':
-            rotacaoN4 -= rotacaoN4 > -90 ? 5 : 0;
+            rotacaoN4 -= rotacaoN4 > -90 ? 15 : 0;
             //cout << rotacaoN4 << endl;
             break;
 
         case 'a':
-            rotacaoN3 += rotacaoN3 < 45 ? 5 : 0;
+            rotacaoN3 += rotacaoN3 < 45 ? 15 : 0;
             //cout << rotacaoN3 << endl;
             break;
 
         case 's':
-            rotacaoN3 -= rotacaoN3 > -45 ? 5 : 0;
+            rotacaoN3 -= rotacaoN3 > -45 ? 15 : 0;
             //cout << rotacaoN3 << endl;
             break;
 
         case 'z':
-            rotacaoN2 += rotacaoN2 < 45 ? 5 : 0;
+            rotacaoN2 += rotacaoN2 < 45 ? 15 : 0;
             //cout << rotacaoN2 << endl;
             break;
 
         case 'x':
-            rotacaoN2 -= rotacaoN2 > -45 ? 5 : 0;
+            rotacaoN2 -= rotacaoN2 > -45 ? 15 : 0;
             //cout << rotacaoN2 << endl;
             break;
 
         case ' ':
-            Ponto a, b;
-            int i;
-            float dist;
-
             podeMover = !podeMover;
             if (!podeMover) segurando = -1;
-
-            for (i = 8; i < numObjetos; i++)
-            {
-                cout << "ROBO: |  A(" << pa[7].x << ", " << pa[7].y << ")" << endl;
-                cout << "ROBO: |  B(" << pb[7].x << ", " << pb[7].y << ")" << endl;
-                cout << "A_I: " << i << "  |  A(" << pa[i].x << ", " << pa[i].y << ")" << endl;
-                cout << "B_I: " << i << "  |  B(" << pb[i].x << ", " << pb[i].y << ")" << endl;
-
-                dist = sqrt(pow((pb[7].x - pb[i].x), 2) + pow((pb[7].y - pb[i].y), 2));
-                if (dist < pa[i].x + 1) segurando = i;
-
-                cout << segurando << endl << endl;
-            }
+            VerificarSePodePegar();
             break;
 
 		default:
@@ -486,11 +544,11 @@ void arrow_keys ( int a_keys, int x, int y )
 			break;
 
         case GLUT_KEY_LEFT:
-            baseDx -= 1;
+            baseDx -= 2;
             break;
 
         case GLUT_KEY_RIGHT:
-            baseDx += 1;
+            baseDx += 2;
             break;
 
 		default:
@@ -516,11 +574,20 @@ void CarregaCenario()
     CarregaObjeto("gameObjects/nivel3Robo.txt", 6);
     CarregaObjeto("gameObjects/nivel4Robo.txt", 7);
 
-    // Caixas
-    CarregaObjeto("gameObjects/caixaAmarela.txt", 8);
-    CarregaObjeto("gameObjects/caixaVerde.txt", 9);
+    // Prateleiras
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 8);
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 9);
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 10);
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 11);
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 12);
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 13);
 
-    numObjetos = 10;
+    // Caixas
+    CarregaObjeto("gameObjects/caixaAmarela.txt", 14);
+    CarregaObjeto("gameObjects/caixaVerde.txt", 15);
+
+
+    numObjetos = 16;
 
     pa.resize(numObjetos+1);
     pb.resize(numObjetos+1);
@@ -534,8 +601,6 @@ void CarregaCenario()
 
 void DefinirPropriedades()
 {
-    //deslocamento[].x = ; deslocamento[].y = ;
-
     // Cenário (piso e paredes)
     deslocamento[0].x = 0; deslocamento[0].y = 0;
     deslocamento[1].x = 0; deslocamento[1].y = objetos[0].size();
@@ -544,9 +609,18 @@ void DefinirPropriedades()
     // Robo
     deslocamento[3].x = larguraLogica/2.0; deslocamento[3].y = objetos[0].size();
 
-    // Caixas
-    deslocamento[8].x = 15; deslocamento[8].y = objetos[0].size();
-    deslocamento[9].x = 10; deslocamento[9].y = objetos[0].size();
+    // Prateleiras
+    deslocamento[8].x = objetos[1][0].size() - 2; deslocamento[8].y = larguraLogica/8.0;
+    deslocamento[9].x = objetos[1][0].size() - 2; deslocamento[9].y = 2 * (larguraLogica/8.0);
+    deslocamento[10].x = objetos[1][0].size() - 2; deslocamento[10].y = 3 * (larguraLogica/8.0);
+
+    deslocamento[11].x = deslocamento[2].x - objetos[11][0].size() + 2; deslocamento[11].y = larguraLogica/8.0;
+    deslocamento[12].x = deslocamento[2].x - objetos[12][0].size() + 2; deslocamento[12].y = 2 * (larguraLogica/8.0);
+    deslocamento[13].x = deslocamento[2].x - objetos[13][0].size() + 2; deslocamento[13].y = 3 * (larguraLogica/8.0);
+
+        // Caixas
+    deslocamento[14].x = 15; deslocamento[14].y = objetos[0].size();
+    deslocamento[15].x = 10; deslocamento[15].y = objetos[0].size();
 }
 
 // **********************************************************************
