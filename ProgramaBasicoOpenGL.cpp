@@ -65,7 +65,7 @@ float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
 vector< vector< vector<float> > > cores; // [objeto][cor][componente]
 vector< vector< vector<int> > > objetos; // [objeto][x][y]
 vector<Instancia> deslocamento; // [objetos]
-vector<Ponto> pa, pb; // [objeto]
+vector<Ponto> pa, pb, cLocal, cUniverso; // [objeto]
 
 void CalculaPonto(Ponto p, Ponto &out) {
 
@@ -261,12 +261,14 @@ void DesenhaNivel4Robo()
     glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
 
     a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
+    cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0};
 
     DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
 
     glTranslated((-1) * (objetos[7][0].size()/2.0),0,0);
 
     CalculaPonto(a, b);
+    CalculaPonto(cLocal[7], cUniverso[7]);
     pa[7] = a;
     pb[7] = b;
 
@@ -284,7 +286,9 @@ void DesenhaNivel3Robo()
 {
     glTranslatef(0.0, objetos[5].size() - 2.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
     glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
+    cLocal[6] = {(objetos[6][0].size()/2.0), objetos[6].size()/2.0, 0.0};
     DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+    CalculaPonto(cLocal[6], cUniverso[6]);
     DesenhaNivel4Robo();
 }
 
@@ -294,7 +298,9 @@ void DesenhaNivel2Robo()
 {
     glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona acima do nível, deslocando uma unidade abaixo (sobrepõe)
     glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
+    cLocal[5] = {(objetos[5][0].size()/2.0), objetos[5].size()/2.0, 0.0};
     DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+    CalculaPonto(cLocal[5], cUniverso[5]);
     DesenhaNivel3Robo();
 }
 
@@ -303,7 +309,9 @@ void DesenhaNivel2Robo()
 void DesenhaNivel1Robo()
 {
     glTranslatef(0.0, objetos[3].size(), 0.0); // Posiciona acima da base
+    cLocal[4] = {(objetos[4][0].size()/2.0), objetos[4].size()/2.0, 0.0};
     DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Desenha de forma centralizada (em relação ao SRO)
+    CalculaPonto(cLocal[4], cUniverso[4]);
     DesenhaNivel2Robo();
 }
 
@@ -319,31 +327,11 @@ void DesenhaBaseRobo()
 
 void DesenhaRobo()
 {
-    Ponto a, b, c, d, centroLocal, centroUniverso;
-
     glPushMatrix();
-
         glTranslatef(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy, 0.0); // Posicina e movimenta em relação universo
-        centroLocal = {(objetos[3][0].size()/2.0), (objetos[3].size()/2.0), 0.0};
+        cLocal[3] = {(objetos[3][0].size()/2.0), objetos[3].size()/2.0, 0.0};
         DesenhaBaseRobo();
-
-        CalculaPonto(centroLocal, centroUniverso);
-
-        a = b = c = d = centroUniverso;
-        a.x -= (objetos[3][0].size()/2.0); a.y -= (objetos[3].size()/2.0);
-        b.x -= (objetos[3][0].size()/2.0); b.y += (objetos[3].size()/2.0);
-        c.x += (objetos[3][0].size()/2.0); c.y += (objetos[3].size()/2.0);
-        d.x += (objetos[3][0].size()/2.0); d.y -= (objetos[3].size()/2.0);
-
-
-        cout << "CentroLocal:(" << centroLocal.x << ", " << centroLocal.y << ")" << endl;
-        cout << "CentroUniverso:(" << centroUniverso.x << ", " << centroUniverso.y << ")" << endl;
-        cout << "A(" << a.x << ", " << a.y << ")" << endl;
-        cout << "B(" << b.x << ", " << b.y << ")" << endl;
-        cout << "C(" << c.x << ", " << c.y << ")" << endl;
-        cout << "D(" << d.x << ", " << d.y << ")" << endl;
-        cout << endl;
-
+        CalculaPonto(cLocal[3], cUniverso[3]);
     glPopMatrix();
 }
 
@@ -362,8 +350,8 @@ void DesenhaPisoParedesPrateleiras()
             a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
             DesenhaObjeto(i, 0.0, 0.0);
             CalculaPonto(a, b);
-            pa[i] = a;
-            pb[i] = b;
+            pa[i] = cLocal[i] = a;
+            pb[i] = cUniverso[i] = b;
         glPopMatrix();
     }
 
@@ -375,8 +363,8 @@ void DesenhaPisoParedesPrateleiras()
             a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
             DesenhaObjeto(i, 0.0, 0.0);
             CalculaPonto(a, b);
-            pa[i] = a;
-            pb[i] = b;
+            pa[i] = cLocal[i] = a;
+            pb[i] = cUniverso[i] = b;
         glPopMatrix();
     }
 }
@@ -385,17 +373,33 @@ void DesenhaPisoParedesPrateleiras()
 
 void VerificarSePodeMover()
 {
+    Ponto a, b, c, d;
     int i, j;
+
+    system("clear");
 
     for (i = 0; i < numObjetos; i++)
     {
-        for (j = 0; j < numObjetos; j++)
-        {
-            if (i != j)
-            {
+        //centroLocal = {(objetos[i][0].size()/2.0), (objetos[i].size()/2.0), 0.0};
+        //CalculaPonto(centroLocal, centroUniverso);
 
-            }
-        }
+        //centroLocal = pa[i];
+        //centroUniverso = pb[i];
+
+        a = b = c = d = cUniverso[i];
+        a.x -= (objetos[i][0].size()/2.0); a.y -= (objetos[i].size()/2.0);
+        b.x -= (objetos[i][0].size()/2.0); b.y += (objetos[i].size()/2.0);
+        c.x += (objetos[i][0].size()/2.0); c.y += (objetos[i].size()/2.0);
+        d.x += (objetos[i][0].size()/2.0); d.y -= (objetos[i].size()/2.0);
+
+
+        cout << i << "\tCentroLocal:(" << cLocal[i].x << ", " << cLocal[i].y << ") | ";
+        cout << "CentroUniverso:(" << cUniverso[i].x << ", " << cUniverso[i].y << ")" << endl;
+        cout << "\tA(" << a.x << ", " << a.y << "),  ";
+        cout << "B(" << b.x << ", " << b.y << "),  ";
+        cout << "C(" << c.x << ", " << c.y << "),  ";
+        cout << "D(" << d.x << ", " << d.y << ")" << endl;
+        cout << endl;
     }
 }
 
@@ -604,10 +608,17 @@ void CarregaCenario()
 
     pa.resize(numObjetos+1);
     pb.resize(numObjetos+1);
+    cLocal.resize(numObjetos+1);
+    cUniverso.resize(numObjetos+1);
     deslocamento.resize(numObjetos+1);
 
-    for (i = 0; i < numObjetos; i++) pa[i] = {0, 0, 0};
-    for (i = 0; i < numObjetos; i++) pb[i] = {0, 0, 0};
+    for (i = 0; i < numObjetos; i++)
+    {
+        pa[i] = {0, 0, 0};
+        pb[i] = {0, 0, 0};
+        cLocal[i] = {0, 0, 0};
+        cUniverso[i] = {0, 0, 0};
+    }
 }
 
 // -------------------------------------------------- //
