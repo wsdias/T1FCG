@@ -246,6 +246,8 @@ void DesenhaCaixas()
                 CalculaPonto(a, b);
                 pa[i] = a;
                 pb[i] = b;
+                cLocal[i] = a;
+                CalculaPonto(a, cUniverso[i]);
             glPopMatrix();
         }
     }
@@ -257,70 +259,95 @@ void DesenhaNivel4Robo()
 {
     Ponto a, b;
 
-    glTranslatef(0.0, objetos[6].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
-    glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
+    glPushMatrix();
 
-    a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
-    cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0};
+        glTranslatef(0.0, objetos[6].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
+        glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
 
-    DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+        a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
+        cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0};
 
-    glTranslated((-1) * (objetos[7][0].size()/2.0),0,0);
+        DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
 
-    CalculaPonto(a, b);
-    CalculaPonto(cLocal[7], cUniverso[7]);
-    pa[7] = a;
-    pb[7] = b;
+        glTranslated((-1) * (objetos[7][0].size()/2.0),0,0);
 
-    if (segurando != -1)
-    {
-        deslocamento[segurando].x = b.x;
-        deslocamento[segurando].y = b.y;
-        DesenhaObjeto(segurando, a.x, a.y);
-    }
+        CalculaPonto(a, b);
+        CalculaPonto(cLocal[7], cUniverso[7]);
+        pa[7] = a;
+        pb[7] = b;
+
+        if (segurando != -1)
+        {
+            deslocamento[segurando].x = b.x;
+            deslocamento[segurando].y = b.y;
+            cUniverso[segurando].x = deslocamento[segurando].x;
+            cUniverso[segurando].y = deslocamento[segurando].y;
+            DesenhaObjeto(segurando, a.x, a.y);
+        }
+
+    glPopMatrix();
 }
 
 // -------------------------------------------------- //
 
 void DesenhaNivel3Robo()
 {
-    glTranslatef(0.0, objetos[5].size() - 2.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
-    glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
-    cLocal[6] = {(objetos[6][0].size()/2.0), objetos[6].size()/2.0, 0.0};
-    DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
-    CalculaPonto(cLocal[6], cUniverso[6]);
-    DesenhaNivel4Robo();
+    glPushMatrix();
+
+        glTranslatef(0.0, objetos[5].size() - 2.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
+        glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
+        DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+
+        cLocal[6] = {0.0, objetos[6].size()/2.0, 0.0};
+        CalculaPonto(cLocal[6], cUniverso[6]);
+
+        DesenhaNivel4Robo();
+    glPopMatrix();
 }
 
 // -------------------------------------------------- //
 
 void DesenhaNivel2Robo()
 {
-    glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona acima do nível, deslocando uma unidade abaixo (sobrepõe)
-    glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
-    cLocal[5] = {(objetos[5][0].size()/2.0), objetos[5].size()/2.0, 0.0};
-    DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
-    CalculaPonto(cLocal[5], cUniverso[5]);
-    DesenhaNivel3Robo();
+    glPushMatrix();
+
+        glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona acima do nível, deslocando uma unidade abaixo (sobrepõe)
+        glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
+        DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+
+        cLocal[5] = {0.0, objetos[5].size()/2.0, 0.0};
+        CalculaPonto(cLocal[5], cUniverso[5]);
+
+        DesenhaNivel3Robo();
+
+    glPopMatrix();
 }
 
 // -------------------------------------------------- //
 
 void DesenhaNivel1Robo()
 {
-    glTranslatef(0.0, objetos[3].size(), 0.0); // Posiciona acima da base
-    cLocal[4] = {(objetos[4][0].size()/2.0), objetos[4].size()/2.0, 0.0};
-    DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Desenha de forma centralizada (em relação ao SRO)
-    CalculaPonto(cLocal[4], cUniverso[4]);
-    DesenhaNivel2Robo();
+    glPushMatrix();
+
+        glTranslatef(0.0, objetos[3].size(), 0.0); // Posiciona acima da base
+        DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Desenha de forma centralizada (em relação ao SRO)
+
+        cLocal[4] = {0.0, objetos[4].size()/2.0, 0.0};
+        CalculaPonto(cLocal[4], cUniverso[4]);
+
+        DesenhaNivel2Robo();
+
+    glPopMatrix();
 }
 
 // -------------------------------------------------- //
 
 void DesenhaBaseRobo()
 {
-    DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0);
-    DesenhaNivel1Robo();
+    glPushMatrix();
+        DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0);
+        DesenhaNivel1Robo();
+    glPopMatrix();
 }
 
 // -------------------------------------------------- //
@@ -328,10 +355,13 @@ void DesenhaBaseRobo()
 void DesenhaRobo()
 {
     glPushMatrix();
+
         glTranslatef(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy, 0.0); // Posicina e movimenta em relação universo
-        cLocal[3] = {(objetos[3][0].size()/2.0), objetos[3].size()/2.0, 0.0};
         DesenhaBaseRobo();
+
+        cLocal[3] = {0.0, objetos[3].size()/2.0, 0.0};
         CalculaPonto(cLocal[3], cUniverso[3]);
+
     glPopMatrix();
 }
 
