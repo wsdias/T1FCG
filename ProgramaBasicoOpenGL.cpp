@@ -246,8 +246,8 @@ void DesenhaCaixas()
                 CalculaPonto(a, b);
                 pa[i] = a;
                 pb[i] = b;
-                cLocal[i] = a;
-                CalculaPonto(a, cUniverso[i]);
+                cLocal[i] = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
+                CalculaPonto(cLocal[i], cUniverso[i]);
             glPopMatrix();
         }
     }
@@ -265,7 +265,9 @@ void DesenhaNivel4Robo()
         glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
 
         a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
+
         cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0};
+
 
         DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
 
@@ -278,6 +280,7 @@ void DesenhaNivel4Robo()
 
         if (segurando != -1)
         {
+            cLocal[segurando] = a;
             deslocamento[segurando].x = b.x;
             deslocamento[segurando].y = b.y;
             cUniverso[segurando].x = deslocamento[segurando].x;
@@ -410,17 +413,22 @@ void VerificarSePodeMover()
 
     for (i = 0; i < numObjetos; i++)
     {
-        //centroLocal = {(objetos[i][0].size()/2.0), (objetos[i].size()/2.0), 0.0};
-        //CalculaPonto(centroLocal, centroUniverso);
-
-        //centroLocal = pa[i];
-        //centroUniverso = pb[i];
-
-        a = b = c = d = cUniverso[i];
-        a.x -= (objetos[i][0].size()/2.0); a.y -= (objetos[i].size()/2.0);
-        b.x -= (objetos[i][0].size()/2.0); b.y += (objetos[i].size()/2.0);
-        c.x += (objetos[i][0].size()/2.0); c.y += (objetos[i].size()/2.0);
-        d.x += (objetos[i][0].size()/2.0); d.y -= (objetos[i].size()/2.0);
+        if (i == segurando)
+        {
+            a = b = c = d = cUniverso[i];
+            a.x -= (objetos[i][0].size()/2.0); a.y -= (objetos[i].size()/2.0);
+            b.x -= (objetos[i][0].size()/2.0); b.y += (objetos[i].size()/2.0);
+            c.x += (objetos[i][0].size()/2.0); c.y += (objetos[i].size()/2.0);
+            d.x += (objetos[i][0].size()/2.0); d.y -= (objetos[i].size()/2.0);
+        }
+        else
+        {
+            a = b = c = d = cUniverso[i];
+            a.x -= (objetos[i][0].size()/2.0); a.y -= (objetos[i].size()/2.0);
+            b.x -= (objetos[i][0].size()/2.0); b.y += (objetos[i].size()/2.0);
+            c.x += (objetos[i][0].size()/2.0); c.y += (objetos[i].size()/2.0);
+            d.x += (objetos[i][0].size()/2.0); d.y -= (objetos[i].size()/2.0);
+        }
 
         glPushMatrix();
             glColor3f(1, 0, 0);
@@ -645,10 +653,14 @@ void CarregaCenario()
 
     // Caixas
     CarregaObjeto("gameObjects/caixaAmarela.txt", 14);
-    CarregaObjeto("gameObjects/caixaVerde.txt", 15);
+    CarregaObjeto("gameObjects/caixaAmarela.txt", 15);
+    CarregaObjeto("gameObjects/caixaAmarela.txt", 16);
+    CarregaObjeto("gameObjects/caixaVerde.txt", 17);
+    CarregaObjeto("gameObjects/caixaVerde.txt", 18);
+    CarregaObjeto("gameObjects/caixaVerde.txt", 19);
 
 
-    numObjetos = 16;
+    numObjetos = 20;
 
     pa.resize(numObjetos+1);
     pb.resize(numObjetos+1);
@@ -686,9 +698,16 @@ void DefinirPropriedades()
     deslocamento[12].x = deslocamento[2].x - objetos[12][0].size() + 2; deslocamento[12].y = 2 * (larguraLogica/8.0);
     deslocamento[13].x = deslocamento[2].x - objetos[13][0].size() + 2; deslocamento[13].y = 3 * (larguraLogica/8.0);
 
-        // Caixas
-    deslocamento[14].x = 15; deslocamento[14].y = objetos[0].size();
-    deslocamento[15].x = 10; deslocamento[15].y = objetos[0].size();
+    // Caixas
+    deslocamento[14].x = 50; deslocamento[14].y = objetos[0].size();
+    deslocamento[15].x = 50; deslocamento[15].y = objetos[0].size() + objetos[14].size();
+    deslocamento[16].x = 60; deslocamento[16].y = objetos[0].size();
+    deslocamento[17].x = (larguraLogica/2.0) + 30; deslocamento[17].y = objetos[0].size();
+    deslocamento[18].x = (larguraLogica/2.0) + 40; deslocamento[18].y = objetos[0].size();
+    deslocamento[19].x = (larguraLogica/2.0) + 40; deslocamento[19].y = objetos[0].size() + objetos[18].size();
+
+
+
 }
 
 // **********************************************************************
