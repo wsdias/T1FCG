@@ -61,6 +61,8 @@ typedef struct{
 bool podeMover = false;
 int larguraLogica = 192, alturaLogica = 108, segurando = -1, numObjetos = 0;
 float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
+float yN4SRO = 0, yN4SRU = 1;
+float caindo = -1;
 
 vector< vector< vector<float> > > cores; // [objeto][cor][componente]
 vector< vector< vector<int> > > objetos; // [objeto][x][y]
@@ -84,6 +86,21 @@ void CalculaPonto(Ponto p, Ponto &out) {
     out.x = ponto_novo[0];
     out.y = ponto_novo[1];
     out.z = ponto_novo[2];
+}
+
+int intersec2d(Ponto k, Ponto l, Ponto m, Ponto n)
+{
+    double det;
+
+    det = (n.x - m.x) * (l.y - k.y)  -  (n.y - m.y) * (l.x - k.x);
+
+    if (det == 0.0)
+        return 0 ; // não há intersecção
+
+    cout << "s: " << ((n.x - m.x) * (m.y - k.y) - (n.y - m.y) * (m.x - k.x))/ det << endl;
+    cout << "t: " << ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det << endl;
+
+    return 1; // há intersecção
 }
 
 // **********************************************************************
@@ -235,11 +252,19 @@ void DesenhaCaixas()
     Ponto a, b;
     int i;
 
+    int j = 0;
+
     for (i = 14; i < numObjetos; i++)
     {
         if (i != segurando)
         {
             glPushMatrix();
+
+
+                while (j!=20){
+                glTranslatef(0, -0.5, 0);j++;
+                }
+
                 glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
                 a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
                 DesenhaObjeto(i, 0.0, 0.0);
@@ -261,7 +286,7 @@ void DesenhaNivel4Robo()
 
     glPushMatrix();
 
-        glTranslatef(0.0, objetos[6].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
+        glTranslatef(0.0, objetos[6].size() - yN4SRU, 0.0); // Posiciona verticalmente em relação ao objeto anterior
         glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
 
         a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
@@ -269,7 +294,7 @@ void DesenhaNivel4Robo()
         cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0};
 
 
-        DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
+        DesenhaObjeto(7, objetos[7][0].size()/2.0, yN4SRO); // Cria instância com parametros desejados (posição no SRO)
 
         glTranslated((-1) * (objetos[7][0].size()/2.0),0,0);
 
@@ -445,13 +470,13 @@ void VerificarSePodeMover()
             glEnd();
         glPopMatrix();
 
-        cout << i << "\tCentroLocal:(" << cLocal[i].x << ", " << cLocal[i].y << ") | ";
+        /*cout << i << "\tCentroLocal:(" << cLocal[i].x << ", " << cLocal[i].y << ") | ";
         cout << "CentroUniverso:(" << cUniverso[i].x << ", " << cUniverso[i].y << ")" << endl;
         cout << "\tA(" << a.x << ", " << a.y << "),  ";
         cout << "B(" << b.x << ", " << b.y << "),  ";
         cout << "C(" << c.x << ", " << c.y << "),  ";
         cout << "D(" << d.x << ", " << d.y << ")" << endl;
-        cout << endl;
+        cout << endl;*/
     }
 }
 
@@ -465,18 +490,49 @@ void VerificarSePodePegar()
 
     for (i = 14; i < numObjetos; i++)
     {
-        cout << "ROBO: |  A(" << pa[7].x << ", " << pa[7].y << ")" << endl;
+        /*cout << "ROBO: |  A(" << pa[7].x << ", " << pa[7].y << ")" << endl;
         cout << "ROBO: |  B(" << pb[7].x << ", " << pb[7].y << ")" << endl;
         cout << "A_I: " << i << "  |  A(" << pa[i].x << ", " << pa[i].y << ")" << endl;
-        cout << "B_I: " << i << "  |  B(" << pb[i].x << ", " << pb[i].y << ")" << endl;
+        cout << "B_I: " << i << "  |  B(" << pb[i].x << ", " << pb[i].y << ")" << endl;*/
 
         dist = sqrt(pow((pb[7].x - pb[i].x), 2) + pow((pb[7].y - pb[i].y), 2));
         if (dist < pa[i].x + 1) segurando = i;
 
-        cout << segurando << endl << endl;
+        //cout << segurando << endl << endl;
     }
 }
 
+void SoltaCaixa()
+{
+
+    caindo = segurando;
+    segurando = -1;
+
+    Ponto a, b, c, d;
+    Ponto e, f, g, h;
+    bool colidiu = false;
+    int k = 15;
+    e = f = g = h = cUniverso[k];
+    e.x -= (objetos[k][0].size()/2.0); e.y -= (objetos[k].size()/2.0);
+    f.x -= (objetos[k][0].size()/2.0); f.y += (objetos[k].size()/2.0);
+    g.x += (objetos[k][0].size()/2.0); g.y += (objetos[k].size()/2.0);
+    h.x += (objetos[k][0].size()/2.0); h.y -= (objetos[k].size()/2.0);
+    for (int i = 14; i < 15; i++)
+    {
+        a = b = c = d = cUniverso[i];
+        a.x -= (objetos[i][0].size()/2.0); a.y -= (objetos[i].size()/2.0);
+        b.x -= (objetos[i][0].size()/2.0); b.y += (objetos[i].size()/2.0);
+        c.x += (objetos[i][0].size()/2.0); c.y += (objetos[i].size()/2.0);
+        d.x += (objetos[i][0].size()/2.0); d.y -= (objetos[i].size()/2.0);
+
+        //cout << "(" << e.x << ", " << h.x << ")  (" << a.x << "," << d.x << ")" << endl;
+        cout << "(" << e.y << ", " << h.y << ")  (" << b.y << "," << c.y << ")" << endl;
+
+        cUniverso[15].y -= 100;
+
+        if (((e.x >= a.x && e.x <= d.x) || (h.x >= a.x && h.x <= d.x)) && (e.y < b.y)) cout << "# Colide!";
+    }
+}
 
 // **********************************************************************
 //  void display( void )
@@ -501,38 +557,15 @@ void display( void )
 	// Coloque aqui as chamadas das rotinas que desenha os objetos
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	// Axis
-	/*glPushMatrix();
-        glColor3f(0,0,0);
-        glLineWidth(10);
-        glBegin(GL_LINES);
-            // Vertical axis
-            glVertex2d(larguraLogica/2.0, 0);
-            glVertex2d(larguraLogica/2.0, alturaLogica);
-            // Horizontal axis
-            glVertex2d(0, alturaLogica/2.0);
-            glVertex2d(larguraLogica, alturaLogica/2.0);
-        glEnd();
-	glPopMatrix();*/
-
     DesenhaPisoParedesPrateleiras();
     DesenhaCaixas();
     DesenhaRobo();
 
-    VerificarSePodeMover();
-
-    glColor3f(1,0,0);
+    /*glColor3f(1,0,0);
     glBegin(GL_LINES);
         glVertex2d(0,0);
         glVertex2d(pb[7].x, pb[7].y);
-    glEnd();
-
-    /*for (int i = 0; i < numObjetos; i++)
-    {
-        cout << i << "\tPA:(" << pa[i].x << ", " << pa[i].y << ")" << endl;
-        cout << "\tPB:(" << pb[i].x << ", " << pb[i].y << ")" << endl;
-        cout << endl;
-    }*/
+    glEnd();*/
 
 	glutSwapBuffers();
 }
@@ -573,18 +606,19 @@ void keyboard ( unsigned char key, int x, int y )
             break;
 
         case 'z':
-            rotacaoN2 += rotacaoN2 < 45 ? 15 : 0;
+            rotacaoN2 += rotacaoN2 < 90 ? 15 : 0;
             //cout << rotacaoN2 << endl;
             break;
 
         case 'x':
-            rotacaoN2 -= rotacaoN2 > -45 ? 15 : 0;
+            rotacaoN2 -= rotacaoN2 > -90 ? 15 : 0;
             //cout << rotacaoN2 << endl;
             break;
 
         case ' ':
             podeMover = !podeMover;
-            if (!podeMover) segurando = -1;
+            //if (!podeMover && segurando != -1) SoltaCaixa();
+            if (!podeMover&& segurando != -1) SoltaCaixa();
             VerificarSePodePegar();
             break;
 
@@ -619,6 +653,16 @@ void arrow_keys ( int a_keys, int x, int y )
         case GLUT_KEY_RIGHT:
             baseDx += 2;
             break;
+
+        /*case GLUT_KEY_PAGE_UP:
+            yN4SRU -= 1;
+            yN4SRO += 1;
+            break;*/
+
+        /*case GLUT_KEY_PAGE_DOWN:
+            yN4SRU += 1;
+            yN4SRO -= 1;
+            break;*/
 
 		default:
 			break;
@@ -700,11 +744,11 @@ void DefinirPropriedades()
 
     // Caixas
     deslocamento[14].x = 50; deslocamento[14].y = objetos[0].size();
-    deslocamento[15].x = 50; deslocamento[15].y = objetos[0].size() + objetos[14].size();
-    deslocamento[16].x = 60; deslocamento[16].y = objetos[0].size();
-    deslocamento[17].x = (larguraLogica/2.0) + 30; deslocamento[17].y = objetos[0].size();
-    deslocamento[18].x = (larguraLogica/2.0) + 40; deslocamento[18].y = objetos[0].size();
-    deslocamento[19].x = (larguraLogica/2.0) + 40; deslocamento[19].y = objetos[0].size() + objetos[18].size();
+    deslocamento[15].x = 50; deslocamento[15].y = objetos[0].size() + objetos[14].size() + 50;
+    //deslocamento[16].x = 60; deslocamento[16].y = objetos[0].size();
+    //deslocamento[17].x = (larguraLogica/2.0) + 30; deslocamento[17].y = objetos[0].size();
+    //deslocamento[18].x = (larguraLogica/2.0) + 40; deslocamento[18].y = objetos[0].size();
+    //deslocamento[19].x = (larguraLogica/2.0) + 40; deslocamento[19].y = objetos[0].size() + objetos[18].size();
 
 
 
