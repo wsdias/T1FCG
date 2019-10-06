@@ -1,14 +1,14 @@
 // **********************************************************************
 //
-//  T1 - Fundamentos de ComputaÁ„o Gr·fica
+//  T1 - Fundamentos de Computa√ß√£o Gr√°fica
 //
 //  Willian Schmiele Dias
 //
 //  2019/2
 //
 // **********************************************************************
-// PUCRS/Escola Politécnica
-// COMPUTAÇÃO GRÁFICA
+// PUCRS/Escola Polit≈Ωcnica
+// COMPUTA‚Äö√åO GR√ßFICA
 //
 // Programa basico para criar aplicacoes 2D em OpenGL
 //
@@ -116,7 +116,7 @@ void animate()
     // cout << "AccumTime: " << AccumTime << endl;
     // Anima cubos
     //AngY++;
-    // Salva o tempo para o próximo ciclo de rendering
+    // Salva o tempo para o pr‚Äîximo ciclo de rendering
     last_idle_time = time_now;
 
     //if  (GetAsyncKeyState(32) & 0x8000) != 0)
@@ -127,7 +127,7 @@ void animate()
 }
 // **********************************************************************
 //  void init(void)
-//  Inicializa os par‚metros globais de OpenGL
+//  Inicializa os par√¢metros globais de OpenGL
 //
 // **********************************************************************
 void init(void)
@@ -146,10 +146,10 @@ void reshape( int w, int h )
     // Reset the coordinate system before modifying
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    // Define a area a ser ocupada pela ·rea OpenGL dentro da Janela
+    // Define a area a ser ocupada pela √°rea OpenGL dentro da Janela
     glViewport(0, 0, w, h);
 
-    // Define os limites lÛgicos da ·rea OpenGL dentro da Janela
+    // Define os limites l√≥gicos da √°rea OpenGL dentro da Janela
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     //glOrtho((-1)*larguraLogica,larguraLogica,(-1)*alturaLogica,alturaLogica,0,1);
@@ -242,10 +242,8 @@ void DesenhaCaixas()
             glPushMatrix();
                 glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
                 a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
-                cLocal[i] = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
                 DesenhaObjeto(i, 0.0, 0.0);
                 CalculaPonto(a, b);
-                CalculaPonto(cLocal[i], cUniverso[i]);
                 pa[i] = a;
                 pb[i] = b;
             glPopMatrix();
@@ -259,15 +257,13 @@ void DesenhaNivel4Robo()
 {
     Ponto a, b;
 
-    glPushMatrix();
-
-    glTranslatef(0.0, objetos[6].size() - 1.0, 0.0); // Posiciona verticalmente em relaÁ„o ao objeto anterior
+    glTranslatef(0.0, objetos[6].size() - 1.0, 0.0); // Posiciona verticalmente em rela√ß√£o ao objeto anterior
     glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
 
     a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
     cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0};
 
-    DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria inst‚ncia com parametros desejados (posiÁ„o no SRO)
+    DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria inst√¢ncia com parametros desejados (posi√ß√£o no SRO)
 
     glTranslated((-1) * (objetos[7][0].size()/2.0),0,0);
 
@@ -275,8 +271,6 @@ void DesenhaNivel4Robo()
     CalculaPonto(cLocal[7], cUniverso[7]);
     pa[7] = a;
     pb[7] = b;
-
-    glPopMatrix();
 
     if (segurando != -1)
     {
@@ -290,51 +284,43 @@ void DesenhaNivel4Robo()
 
 void DesenhaNivel3Robo()
 {
-    glPushMatrix();
-        glTranslatef(0.0, objetos[5].size() - 2.0, 0.0); // Posiciona verticalmente em ralaÁ„o ao objeto anterior
-        glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
-        cLocal[6] = {(objetos[6][0].size()/2.0), objetos[6].size()/2.0, 0.0};
-        DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria inst‚ncia com parametros desejados (posiÁ„o no SRO)
-        CalculaPonto(cLocal[6], cUniverso[6]);
-        DesenhaNivel4Robo();
-    glPopMatrix();
+    glTranslatef(0.0, objetos[5].size() - 2.0, 0.0); // Posiciona verticalmente em rala√ß√£o ao objeto anterior
+    glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
+    cLocal[6] = {(objetos[6][0].size()/2.0), objetos[6].size()/2.0, 0.0};
+    DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria inst√¢ncia com parametros desejados (posi√ß√£o no SRO)
+    CalculaPonto(cLocal[6], cUniverso[6]);
+    DesenhaNivel4Robo();
 }
 
 // -------------------------------------------------- //
 
 void DesenhaNivel2Robo()
 {
-    glPushMatrix();
-        glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona acima do nÌvel, deslocando uma unidade abaixo (sobrepıe)
-        glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
-        cLocal[5] = {(objetos[5][0].size()/2.0), objetos[5].size()/2.0, 0.0};
-        DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria inst‚ncia com parametros desejados (posiÁ„o no SRO)
-        CalculaPonto(cLocal[5], cUniverso[5]);
-        DesenhaNivel3Robo();
-    glPopMatrix();
+    glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona acima do n√≠vel, deslocando uma unidade abaixo (sobrep√µe)
+    glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
+    cLocal[5] = {(objetos[5][0].size()/2.0), objetos[5].size()/2.0, 0.0};
+    DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria inst√¢ncia com parametros desejados (posi√ß√£o no SRO)
+    CalculaPonto(cLocal[5], cUniverso[5]);
+    DesenhaNivel3Robo();
 }
 
 // -------------------------------------------------- //
 
 void DesenhaNivel1Robo()
 {
-    glPushMatrix();
-        glTranslatef(0.0, objetos[3].size(), 0.0); // Posiciona acima da base
-        cLocal[4] = {(objetos[4][0].size()/2.0), objetos[4].size()/2.0, 0.0};
-        DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Desenha de forma centralizada (em relaÁ„o ao SRO)
-        CalculaPonto(cLocal[4], cUniverso[4]);
-        DesenhaNivel2Robo();
-    glPopMatrix();
+    glTranslatef(0.0, objetos[3].size(), 0.0); // Posiciona acima da base
+    cLocal[4] = {(objetos[4][0].size()/2.0), objetos[4].size()/2.0, 0.0};
+    DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Desenha de forma centralizada (em rela√ß√£o ao SRO)
+    CalculaPonto(cLocal[4], cUniverso[4]);
+    DesenhaNivel2Robo();
 }
 
 // -------------------------------------------------- //
 
 void DesenhaBaseRobo()
 {
-    glPushMatrix();
-        DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0);
-        DesenhaNivel1Robo();
-    glPopMatrix();
+    DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0);
+    DesenhaNivel1Robo();
 }
 
 // -------------------------------------------------- //
@@ -342,7 +328,7 @@ void DesenhaBaseRobo()
 void DesenhaRobo()
 {
     glPushMatrix();
-        glTranslatef(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy, 0.0); // Posicina e movimenta em relaÁ„o universo
+        glTranslatef(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy, 0.0); // Posicina e movimenta em rela√ß√£o universo
         cLocal[3] = {(objetos[3][0].size()/2.0), objetos[3].size()/2.0, 0.0};
         DesenhaBaseRobo();
         CalculaPonto(cLocal[3], cUniverso[3]);
@@ -394,6 +380,12 @@ void VerificarSePodeMover()
 
     for (i = 0; i < numObjetos; i++)
     {
+        //centroLocal = {(objetos[i][0].size()/2.0), (objetos[i].size()/2.0), 0.0};
+        //CalculaPonto(centroLocal, centroUniverso);
+
+        //centroLocal = pa[i];
+        //centroUniverso = pb[i];
+
         a = b = c = d = cUniverso[i];
         a.x -= (objetos[i][0].size()/2.0); a.y -= (objetos[i].size()/2.0);
         b.x -= (objetos[i][0].size()/2.0); b.y += (objetos[i].size()/2.0);
@@ -401,7 +393,7 @@ void VerificarSePodeMover()
         d.x += (objetos[i][0].size()/2.0); d.y -= (objetos[i].size()/2.0);
 
         glPushMatrix();
-            glColor3f(1,0,0);
+            glColor3f(1, 0, 0);
             glLineWidth(2);
             glBegin(GL_LINES);
                 glVertex2d(a.x, a.y);
@@ -411,17 +403,17 @@ void VerificarSePodeMover()
                 glVertex2d(c.x, c.y);
                 glVertex2d(d.x, d.y);
                 glVertex2d(d.x, d.y);
-                glVertex2d(a.x, d.y);
+                glVertex2d(a.x, a.y);
             glEnd();
         glPopMatrix();
 
-        /*cout << i << "\tCentroLocal:(" << cLocal[i].x << ", " << cLocal[i].y << ") | ";
+        cout << i << "\tCentroLocal:(" << cLocal[i].x << ", " << cLocal[i].y << ") | ";
         cout << "CentroUniverso:(" << cUniverso[i].x << ", " << cUniverso[i].y << ")" << endl;
         cout << "\tA(" << a.x << ", " << a.y << "),  ";
         cout << "B(" << b.x << ", " << b.y << "),  ";
         cout << "C(" << c.x << ", " << c.y << "),  ";
         cout << "D(" << d.x << ", " << d.y << ")" << endl;
-        cout << endl;*/
+        cout << endl;
     }
 }
 
@@ -458,7 +450,7 @@ void display( void )
 	// Limpa a tela coma cor de fundo
 	glClear(GL_COLOR_BUFFER_BIT);
 
-    // Define os limites lÛgicos da ·rea OpenGL dentro da Janela
+    // Define os limites l√≥gicos da √°rea OpenGL dentro da Janela
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, larguraLogica, 0, alturaLogica, 0, 1);
@@ -647,7 +639,7 @@ void CarregaCenario()
 
 void DefinirPropriedades()
 {
-    // Cen·rio (piso e paredes)
+    // Cen√°rio (piso e paredes)
     deslocamento[0].x = 0; deslocamento[0].y = 0;
     deslocamento[1].x = 0; deslocamento[1].y = objetos[0].size();
     deslocamento[2].x = larguraLogica - objetos[2][0].size(); deslocamento[2].y = objetos[0].size();
@@ -688,36 +680,36 @@ int  main ( int argc, char** argv )
     glutInitWindowSize  ( 650, 500);
 
     // Cria a janela na tela, definindo o nome da
-    // que aparecera na barra de tÌtulo da janela.
+    // que aparecera na barra de t√≠tulo da janela.
     glutCreateWindow    ( "Primeiro Programa em OpenGL" );
 
-    // executa algumas inicializaÁıes
+    // executa algumas inicializa√ß√µes
     init ();
 
     // Define que o tratador de evento para
     // o redesenho da tela. A funcao "display"
-    // ser· chamada automaticamente quando
-    // for necess·rio redesenhar a janela
+    // ser√° chamada automaticamente quando
+    // for necess√°rio redesenhar a janela
     glutDisplayFunc ( display );
     glutIdleFunc(animate);
 
     // Define que o tratador de evento para
     // o redimensionamento da janela. A funcao "reshape"
-    // ser· chamada automaticamente quando
-    // o usu·rio alterar o tamanho da janela
+    // ser√° chamada automaticamente quando
+    // o usu√°rio alterar o tamanho da janela
     glutReshapeFunc ( reshape );
 
     // Define que o tratador de evento para
     // as teclas. A funcao "keyboard"
-    // ser· chamada automaticamente sempre
-    // o usu·rio pressionar uma tecla comum
+    // ser√° chamada automaticamente sempre
+    // o usu√°rio pressionar uma tecla comum
     glutKeyboardFunc ( keyboard );
 
     // Define que o tratador de evento para
     // as teclas especiais(F1, F2,... ALT-A,
     // ALT-B, Teclas de Seta, ...).
-    // A funcao "arrow_keys" ser· chamada
-    // automaticamente sempre o usu·rio
+    // A funcao "arrow_keys" ser√° chamada
+    // automaticamente sempre o usu√°rio
     // pressionar uma tecla especial
     glutSpecialFunc ( arrow_keys );
 
@@ -726,3 +718,4 @@ int  main ( int argc, char** argv )
 
     return 0;
 }
+
