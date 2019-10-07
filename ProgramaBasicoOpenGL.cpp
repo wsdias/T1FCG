@@ -93,14 +93,8 @@ int intersec2d(Ponto k, Ponto l, Ponto m, Ponto n)
     double det;
 
     det = (n.x - m.x) * (l.y - k.y)  -  (n.y - m.y) * (l.x - k.x);
-
-    if (det == 0.0)
-        return 0 ; // não há intersecção
-
-    cout << "s: " << ((n.x - m.x) * (m.y - k.y) - (n.y - m.y) * (m.x - k.x))/ det << endl;
-    cout << "t: " << ((l.x - k.x) * (m.y - k.y) - (l.y - k.y) * (m.x - k.x))/ det << endl;
-
-    return 1; // há intersecção
+    if (det == 0.0) return 0 ; // não há intersecção
+    else return 1; // há intersecção
 }
 
 // **********************************************************************
@@ -259,12 +253,11 @@ void DesenhaCaixas()
         if (i != segurando)
         {
             glPushMatrix();
-
-
-                while (j!=20){
-                glTranslatef(0, -0.5, 0);j++;
+                while (j!=20)
+                {
+                    glTranslatef(0, -0.5, 0);
+                    j++;
                 }
-
                 glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
                 a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
                 DesenhaObjeto(i, 0.0, 0.0);
@@ -288,14 +281,9 @@ void DesenhaNivel4Robo()
 
         glTranslatef(0.0, objetos[6].size() - yN4SRU, 0.0); // Posiciona verticalmente em relação ao objeto anterior
         glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
-
         a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
-
         cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0};
-
-
         DesenhaObjeto(7, objetos[7][0].size()/2.0, yN4SRO); // Cria instância com parametros desejados (posição no SRO)
-
         glTranslated((-1) * (objetos[7][0].size()/2.0),0,0);
 
         CalculaPonto(a, b);
@@ -321,14 +309,11 @@ void DesenhaNivel4Robo()
 void DesenhaNivel3Robo()
 {
     glPushMatrix();
-
         glTranslatef(0.0, objetos[5].size() - 2.0, 0.0); // Posiciona verticalmente em ralação ao objeto anterior
         glRotatef(rotacaoN3, 0.0, 0.0, 1.0);
         DesenhaObjeto(6, objetos[6][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
-
         cLocal[6] = {0.0, objetos[6].size()/2.0, 0.0};
         CalculaPonto(cLocal[6], cUniverso[6]);
-
         DesenhaNivel4Robo();
     glPopMatrix();
 }
@@ -338,16 +323,12 @@ void DesenhaNivel3Robo()
 void DesenhaNivel2Robo()
 {
     glPushMatrix();
-
         glTranslatef(0.0, objetos[4].size() - 2.0, 0.0); // Posiciona acima do nível, deslocando uma unidade abaixo (sobrepõe)
         glRotatef(rotacaoN2, 0.0, 0.0, 1.0);
         DesenhaObjeto(5, objetos[5][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
-
         cLocal[5] = {0.0, objetos[5].size()/2.0, 0.0};
         CalculaPonto(cLocal[5], cUniverso[5]);
-
         DesenhaNivel3Robo();
-
     glPopMatrix();
 }
 
@@ -356,25 +337,11 @@ void DesenhaNivel2Robo()
 void DesenhaNivel1Robo()
 {
     glPushMatrix();
-
         glTranslatef(0.0, objetos[3].size(), 0.0); // Posiciona acima da base
         DesenhaObjeto(4, objetos[4][0].size()/2.0, 0.0); // Desenha de forma centralizada (em relação ao SRO)
-
         cLocal[4] = {0.0, objetos[4].size()/2.0, 0.0};
         CalculaPonto(cLocal[4], cUniverso[4]);
-
         DesenhaNivel2Robo();
-
-    glPopMatrix();
-}
-
-// -------------------------------------------------- //
-
-void DesenhaBaseRobo()
-{
-    glPushMatrix();
-        DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0);
-        DesenhaNivel1Robo();
     glPopMatrix();
 }
 
@@ -383,13 +350,11 @@ void DesenhaBaseRobo()
 void DesenhaRobo()
 {
     glPushMatrix();
-
         glTranslatef(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy, 0.0); // Posicina e movimenta em relação universo
-        DesenhaBaseRobo();
-
+        DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0);
+        DesenhaNivel1Robo();
         cLocal[3] = {0.0, objetos[3].size()/2.0, 0.0};
         CalculaPonto(cLocal[3], cUniverso[3]);
-
     glPopMatrix();
 }
 
@@ -429,32 +394,18 @@ void DesenhaPisoParedesPrateleiras()
 
 // -------------------------------------------------- //
 
-void VerificarSePodeMover()
+void DesenhaContornos()
 {
     Ponto a, b, c, d;
-    int i, j;
-
-    system("clear");
+    int i;
 
     for (i = 0; i < numObjetos; i++)
     {
-        if (i == segurando)
-        {
-            a = b = c = d = cUniverso[i];
-            a.x -= (objetos[i][0].size()/2.0); a.y -= (objetos[i].size()/2.0);
-            b.x -= (objetos[i][0].size()/2.0); b.y += (objetos[i].size()/2.0);
-            c.x += (objetos[i][0].size()/2.0); c.y += (objetos[i].size()/2.0);
-            d.x += (objetos[i][0].size()/2.0); d.y -= (objetos[i].size()/2.0);
-        }
-        else
-        {
-            a = b = c = d = cUniverso[i];
-            a.x -= (objetos[i][0].size()/2.0); a.y -= (objetos[i].size()/2.0);
-            b.x -= (objetos[i][0].size()/2.0); b.y += (objetos[i].size()/2.0);
-            c.x += (objetos[i][0].size()/2.0); c.y += (objetos[i].size()/2.0);
-            d.x += (objetos[i][0].size()/2.0); d.y -= (objetos[i].size()/2.0);
-        }
-
+        a = b = c = d = cUniverso[i];
+        a.x -= (objetos[i][0].size()/2.0); a.y -= (objetos[i].size()/2.0);
+        b.x -= (objetos[i][0].size()/2.0); b.y += (objetos[i].size()/2.0);
+        c.x += (objetos[i][0].size()/2.0); c.y += (objetos[i].size()/2.0);
+        d.x += (objetos[i][0].size()/2.0); d.y -= (objetos[i].size()/2.0);
         glPushMatrix();
             glColor3f(1, 0, 0);
             glLineWidth(2);
@@ -469,48 +420,37 @@ void VerificarSePodeMover()
                 glVertex2d(a.x, a.y);
             glEnd();
         glPopMatrix();
-
-        /*cout << i << "\tCentroLocal:(" << cLocal[i].x << ", " << cLocal[i].y << ") | ";
-        cout << "CentroUniverso:(" << cUniverso[i].x << ", " << cUniverso[i].y << ")" << endl;
-        cout << "\tA(" << a.x << ", " << a.y << "),  ";
-        cout << "B(" << b.x << ", " << b.y << "),  ";
-        cout << "C(" << c.x << ", " << c.y << "),  ";
-        cout << "D(" << d.x << ", " << d.y << ")" << endl;
-        cout << endl;*/
     }
 }
 
 // -------------------------------------------------- //
 
-void VerificarSePodePegar()
+bool VerificarSePodePegar()
 {
-    Ponto a, b;
-    int i;
     float dist;
+    int i;
 
     for (i = 14; i < numObjetos; i++)
     {
-        /*cout << "ROBO: |  A(" << pa[7].x << ", " << pa[7].y << ")" << endl;
-        cout << "ROBO: |  B(" << pb[7].x << ", " << pb[7].y << ")" << endl;
-        cout << "A_I: " << i << "  |  A(" << pa[i].x << ", " << pa[i].y << ")" << endl;
-        cout << "B_I: " << i << "  |  B(" << pb[i].x << ", " << pb[i].y << ")" << endl;*/
-
         dist = sqrt(pow((pb[7].x - pb[i].x), 2) + pow((pb[7].y - pb[i].y), 2));
-        if (dist < pa[i].x + 1) segurando = i;
-
-        //cout << segurando << endl << endl;
+        if (dist < pa[i].x + 1)
+        {
+            segurando = i;
+            return true;
+        }
     }
+    return false;
 }
+
+// -------------------------------------------------- //
 
 void SoltaCaixa()
 {
-
     caindo = segurando;
     segurando = -1;
 
     Ponto a, b, c, d;
     Ponto e, f, g, h;
-    bool colidiu = false;
     int k = 15;
     e = f = g = h = cUniverso[k];
     e.x -= (objetos[k][0].size()/2.0); e.y -= (objetos[k].size()/2.0);
@@ -534,6 +474,88 @@ void SoltaCaixa()
     }
 }
 
+// -------------------------------------------------- //
+
+void CarregaCenario()
+{
+    int i;
+
+    // Piso e paredes
+    CarregaObjeto("gameObjects/piso.txt", 0);
+    CarregaObjeto("gameObjects/paredes.txt", 1);
+    CarregaObjeto("gameObjects/paredes.txt", 2);
+
+    // Robo
+    CarregaObjeto("gameObjects/baseRobo.txt", 3);
+    CarregaObjeto("gameObjects/nivel1Robo.txt", 4);
+    CarregaObjeto("gameObjects/nivel2Robo.txt", 5);
+    CarregaObjeto("gameObjects/nivel3Robo.txt", 6);
+    CarregaObjeto("gameObjects/nivel4Robo.txt", 7);
+
+    // Prateleiras
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 8);
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 9);
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 10);
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 11);
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 12);
+    CarregaObjeto("gameObjects/prateleiraCinza.txt", 13);
+
+    // Caixas
+    CarregaObjeto("gameObjects/caixaAmarela.txt", 14);
+    CarregaObjeto("gameObjects/caixaAmarela.txt", 15);
+    CarregaObjeto("gameObjects/caixaAmarela.txt", 16);
+    CarregaObjeto("gameObjects/caixaVerde.txt", 17);
+    CarregaObjeto("gameObjects/caixaVerde.txt", 18);
+    CarregaObjeto("gameObjects/caixaVerde.txt", 19);
+
+    numObjetos = 20;
+
+    pa.resize(numObjetos+1);
+    pb.resize(numObjetos+1);
+    cLocal.resize(numObjetos+1);
+    cUniverso.resize(numObjetos+1);
+    deslocamento.resize(numObjetos+1);
+
+    for (i = 0; i < numObjetos; i++)
+    {
+        pa[i] = {0, 0, 0};
+        pb[i] = {0, 0, 0};
+        cLocal[i] = {0, 0, 0};
+        cUniverso[i] = {0, 0, 0};
+    }
+}
+
+// -------------------------------------------------- //
+
+void DefinirPropriedades()
+{
+    // Cenário (piso e paredes)
+    deslocamento[0].x = 0; deslocamento[0].y = 0;
+    deslocamento[1].x = 0; deslocamento[1].y = objetos[0].size();
+    deslocamento[2].x = larguraLogica - objetos[2][0].size(); deslocamento[2].y = objetos[0].size();
+
+    // Robo
+    deslocamento[3].x = larguraLogica/2.0; deslocamento[3].y = objetos[0].size();
+
+    // Prateleiras
+    deslocamento[8].x = objetos[1][0].size() - 2; deslocamento[8].y = larguraLogica/8.0;
+    deslocamento[9].x = objetos[1][0].size() - 2; deslocamento[9].y = 2 * (larguraLogica/8.0);
+    deslocamento[10].x = objetos[1][0].size() - 2; deslocamento[10].y = 3 * (larguraLogica/8.0);
+
+    deslocamento[11].x = deslocamento[2].x - objetos[11][0].size() + 2; deslocamento[11].y = larguraLogica/8.0;
+    deslocamento[12].x = deslocamento[2].x - objetos[12][0].size() + 2; deslocamento[12].y = 2 * (larguraLogica/8.0);
+    deslocamento[13].x = deslocamento[2].x - objetos[13][0].size() + 2; deslocamento[13].y = 3 * (larguraLogica/8.0);
+
+    // Caixas
+    deslocamento[14].x = 50; deslocamento[14].y = objetos[0].size();
+    deslocamento[15].x = 50; deslocamento[15].y = objetos[0].size() + objetos[14].size() + 50;
+    //deslocamento[16].x = 60; deslocamento[16].y = objetos[0].size();
+    //deslocamento[17].x = (larguraLogica/2.0) + 30; deslocamento[17].y = objetos[0].size();
+    //deslocamento[18].x = (larguraLogica/2.0) + 40; deslocamento[18].y = objetos[0].size();
+    //deslocamento[19].x = (larguraLogica/2.0) + 40; deslocamento[19].y = objetos[0].size() + objetos[18].size();
+}
+
+
 // **********************************************************************
 //  void display( void )
 //
@@ -549,7 +571,6 @@ void display( void )
     glLoadIdentity();
     glOrtho(0, larguraLogica, 0, alturaLogica, 0, 1);
 
-    // Realy needed?
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -561,11 +582,14 @@ void display( void )
     DesenhaCaixas();
     DesenhaRobo();
 
+    // Desenha uma linha da origem até a ponta da garra do robo
     /*glColor3f(1,0,0);
     glBegin(GL_LINES);
         glVertex2d(0,0);
         glVertex2d(pb[7].x, pb[7].y);
     glEnd();*/
+
+    //DesenhaContornos();
 
 	glutSwapBuffers();
 }
@@ -587,39 +611,32 @@ void keyboard ( unsigned char key, int x, int y )
 
         case 'q':
             rotacaoN4 += rotacaoN4 < 90 ? 15 : 0;
-            //cout << rotacaoN4 << endl;
             break;
 
         case 'w':
             rotacaoN4 -= rotacaoN4 > -90 ? 15 : 0;
-            //cout << rotacaoN4 << endl;
             break;
 
         case 'a':
             rotacaoN3 += rotacaoN3 < 45 ? 15 : 0;
-            //cout << rotacaoN3 << endl;
             break;
 
         case 's':
             rotacaoN3 -= rotacaoN3 > -45 ? 15 : 0;
-            //cout << rotacaoN3 << endl;
             break;
 
         case 'z':
             rotacaoN2 += rotacaoN2 < 90 ? 15 : 0;
-            //cout << rotacaoN2 << endl;
             break;
 
         case 'x':
             rotacaoN2 -= rotacaoN2 > -90 ? 15 : 0;
-            //cout << rotacaoN2 << endl;
             break;
 
         case ' ':
             podeMover = !podeMover;
-            //if (!podeMover && segurando != -1) SoltaCaixa();
-            if (!podeMover&& segurando != -1) SoltaCaixa();
-            VerificarSePodePegar();
+            if (!podeMover && segurando != -1) SoltaCaixa();
+            podeMover = VerificarSePodePegar();
             break;
 
 		default:
@@ -669,90 +686,6 @@ void arrow_keys ( int a_keys, int x, int y )
 	}
 }
 
-// -------------------------------------------------- //
-
-void CarregaCenario()
-{
-    int i;
-
-    // Piso e paredes
-    CarregaObjeto("gameObjects/piso.txt", 0);
-    CarregaObjeto("gameObjects/paredes.txt", 1);
-    CarregaObjeto("gameObjects/paredes.txt", 2);
-
-    // Robo
-    CarregaObjeto("gameObjects/baseRobo.txt", 3);
-    CarregaObjeto("gameObjects/nivel1Robo.txt", 4);
-    CarregaObjeto("gameObjects/nivel2Robo.txt", 5);
-    CarregaObjeto("gameObjects/nivel3Robo.txt", 6);
-    CarregaObjeto("gameObjects/nivel4Robo.txt", 7);
-
-    // Prateleiras
-    CarregaObjeto("gameObjects/prateleiraCinza.txt", 8);
-    CarregaObjeto("gameObjects/prateleiraCinza.txt", 9);
-    CarregaObjeto("gameObjects/prateleiraCinza.txt", 10);
-    CarregaObjeto("gameObjects/prateleiraCinza.txt", 11);
-    CarregaObjeto("gameObjects/prateleiraCinza.txt", 12);
-    CarregaObjeto("gameObjects/prateleiraCinza.txt", 13);
-
-    // Caixas
-    CarregaObjeto("gameObjects/caixaAmarela.txt", 14);
-    CarregaObjeto("gameObjects/caixaAmarela.txt", 15);
-    CarregaObjeto("gameObjects/caixaAmarela.txt", 16);
-    CarregaObjeto("gameObjects/caixaVerde.txt", 17);
-    CarregaObjeto("gameObjects/caixaVerde.txt", 18);
-    CarregaObjeto("gameObjects/caixaVerde.txt", 19);
-
-
-    numObjetos = 20;
-
-    pa.resize(numObjetos+1);
-    pb.resize(numObjetos+1);
-    cLocal.resize(numObjetos+1);
-    cUniverso.resize(numObjetos+1);
-    deslocamento.resize(numObjetos+1);
-
-    for (i = 0; i < numObjetos; i++)
-    {
-        pa[i] = {0, 0, 0};
-        pb[i] = {0, 0, 0};
-        cLocal[i] = {0, 0, 0};
-        cUniverso[i] = {0, 0, 0};
-    }
-}
-
-// -------------------------------------------------- //
-
-void DefinirPropriedades()
-{
-    // Cenário (piso e paredes)
-    deslocamento[0].x = 0; deslocamento[0].y = 0;
-    deslocamento[1].x = 0; deslocamento[1].y = objetos[0].size();
-    deslocamento[2].x = larguraLogica - objetos[2][0].size(); deslocamento[2].y = objetos[0].size();
-
-    // Robo
-    deslocamento[3].x = larguraLogica/2.0; deslocamento[3].y = objetos[0].size();
-
-    // Prateleiras
-    deslocamento[8].x = objetos[1][0].size() - 2; deslocamento[8].y = larguraLogica/8.0;
-    deslocamento[9].x = objetos[1][0].size() - 2; deslocamento[9].y = 2 * (larguraLogica/8.0);
-    deslocamento[10].x = objetos[1][0].size() - 2; deslocamento[10].y = 3 * (larguraLogica/8.0);
-
-    deslocamento[11].x = deslocamento[2].x - objetos[11][0].size() + 2; deslocamento[11].y = larguraLogica/8.0;
-    deslocamento[12].x = deslocamento[2].x - objetos[12][0].size() + 2; deslocamento[12].y = 2 * (larguraLogica/8.0);
-    deslocamento[13].x = deslocamento[2].x - objetos[13][0].size() + 2; deslocamento[13].y = 3 * (larguraLogica/8.0);
-
-    // Caixas
-    deslocamento[14].x = 50; deslocamento[14].y = objetos[0].size();
-    deslocamento[15].x = 50; deslocamento[15].y = objetos[0].size() + objetos[14].size() + 50;
-    //deslocamento[16].x = 60; deslocamento[16].y = objetos[0].size();
-    //deslocamento[17].x = (larguraLogica/2.0) + 30; deslocamento[17].y = objetos[0].size();
-    //deslocamento[18].x = (larguraLogica/2.0) + 40; deslocamento[18].y = objetos[0].size();
-    //deslocamento[19].x = (larguraLogica/2.0) + 40; deslocamento[19].y = objetos[0].size() + objetos[18].size();
-
-
-
-}
 
 // **********************************************************************
 //  void main ( int argc, char** argv )
