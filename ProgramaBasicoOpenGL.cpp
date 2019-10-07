@@ -58,7 +58,7 @@ typedef struct{
     float x, y;
 } Instancia;
 
-float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0, caindo = -1;
+float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0, caixaCaindo = -1;
 int larguraLogica = 192, alturaLogica = 108, segurando = -1, numObjetos = 0;
 bool podeMover = false;
 
@@ -66,6 +66,8 @@ vector< vector< vector<float> > > cores; // [objeto][cor][componente]
 vector< vector< vector<int> > > objetos; // [objeto][x][y]
 vector<Instancia> deslocamento; // [objetos]
 vector<Ponto> pa, pb, cLocal, cUniverso; // [objeto]
+
+bool VerificaLivreEmbaixo(int caixa);
 
 void CalculaPonto(Ponto p, Ponto &out) {
 
@@ -244,20 +246,16 @@ void DesenhaCaixas()
     Ponto a, b;
     int i;
 
-    int j = 0;
+    if (VerificaLivreEmbaixo(15)) deslocamento[15].y -= 0.1;
 
     for (i = 14; i < numObjetos; i++)
     {
         if (i != segurando)
         {
             glPushMatrix();
-                /*while (j!=20)
-                {
-                    glTranslatef(0, -0.5, 0);
-                    j++;
-                }*/
                 glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
                 a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
+
                 DesenhaObjeto(i, 0.0, 0.0);
                 CalculaPonto(a, b);
                 pa[i] = a;
@@ -423,7 +421,7 @@ void DesenhaContornos()
 
 // -------------------------------------------------- //
 
-bool VerificaLibreEmCima(int caixa)
+bool VerificaLivreEmCima(int caixa)
 {
     Ponto a, b, c, d, e, f, g, h;
     float largCaixa, altCaixa, larg, alt;
@@ -463,6 +461,46 @@ bool VerificaLibreEmCima(int caixa)
 
 // -------------------------------------------------- //
 
+bool VerificaLivreEmbaixo(int caixa)
+{
+    Ponto a, b, c, d, e, f, g, h;
+    float largCaixa, altCaixa, larg, alt;
+    int i;
+
+    largCaixa = objetos[caixa][0].size()/2.0;
+    altCaixa = objetos[caixa].size()/2.0;
+
+    e = f = g = h = cUniverso[caixa];
+    e.x -= largCaixa; e.y -= altCaixa;
+    f.x -= largCaixa; f.y += altCaixa;
+    g.x += largCaixa; g.y += altCaixa;
+    h.x += largCaixa; h.y -= altCaixa;
+
+    for (i = 14; i < numObjetos; i++)
+    {
+        if (i != caixa)
+        {
+            larg = objetos[i][0].size()/2.0;
+            alt = objetos[i].size()/2.0;
+
+            a = b = c = d = cUniverso[i];
+            a.x -= larg; a.y -= alt;
+            b.x -= larg; b.y += alt;
+            c.x += larg; c.y += alt;
+            d.x += larg; d.y -= alt;
+
+            if (((e.x >= a.x && f.x <= d.x) || (h.x >= a.x && h.x <= d.x)) && (e.y < b.y))
+            {
+                cout << "# " << caixa << " está embaixo de " << i << endl;
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// -------------------------------------------------- //
+
 bool VerificarSePodePegar()
 {
     float dist;
@@ -473,7 +511,7 @@ bool VerificarSePodePegar()
         dist = sqrt(pow((pb[7].x - pb[i].x), 2) + pow((pb[7].y - pb[i].y), 2));
         if (dist < pa[i].x + 1)
         {
-            if (VerificaLibreEmCima(i))
+            if (VerificaLivreEmCima(i))
             {
                 segurando = i;
                 return true;
@@ -481,38 +519,6 @@ bool VerificarSePodePegar()
         }
     }
     return false;
-}
-
-// -------------------------------------------------- //
-
-void SoltaCaixa()
-{
-    //caindo = segurando;
-    segurando = -1;
-
-    /*Ponto a, b, c, d;
-    Ponto e, f, g, h;
-    int k = 15;
-    e = f = g = h = cUniverso[k];
-    e.x -= (objetos[k][0].size()/2.0); e.y -= (objetos[k].size()/2.0);
-    f.x -= (objetos[k][0].size()/2.0); f.y += (objetos[k].size()/2.0);
-    g.x += (objetos[k][0].size()/2.0); g.y += (objetos[k].size()/2.0);
-    h.x += (objetos[k][0].size()/2.0); h.y -= (objetos[k].size()/2.0);
-    for (int i = 14; i < 15; i++)
-    {
-        a = b = c = d = cUniverso[i];
-        a.x -= (objetos[i][0].size()/2.0); a.y -= (objetos[i].size()/2.0);
-        b.x -= (objetos[i][0].size()/2.0); b.y += (objetos[i].size()/2.0);
-        c.x += (objetos[i][0].size()/2.0); c.y += (objetos[i].size()/2.0);
-        d.x += (objetos[i][0].size()/2.0); d.y -= (objetos[i].size()/2.0);
-
-        //cout << "(" << e.x << ", " << h.x << ")  (" << a.x << "," << d.x << ")" << endl;
-        cout << "(" << e.y << ", " << h.y << ")  (" << b.y << "," << c.y << ")" << endl;
-
-        cUniverso[15].y -= 100;
-
-        if (((e.x >= a.x && e.x <= d.x) || (h.x >= a.x && h.x <= d.x)) && (e.y < b.y)) cout << "# Colide!";
-    }*/
 }
 
 // -------------------------------------------------- //
@@ -676,7 +682,7 @@ void keyboard ( unsigned char key, int x, int y )
 
         case ' ':
             podeMover = !podeMover;
-            if (!podeMover && segurando != -1) SoltaCaixa();
+            if (!podeMover && segurando != -1) segurando = -1;
             podeMover = VerificarSePodePegar();
             break;
 
@@ -713,13 +719,11 @@ void arrow_keys ( int a_keys, int x, int y )
             break;
 
         /*case GLUT_KEY_PAGE_UP:
-            yN4SRU -= 1;
-            yN4SRO += 1;
-            break;*/
+            yAux += 1;
+            break;
 
-        /*case GLUT_KEY_PAGE_DOWN:
-            yN4SRU += 1;
-            yN4SRO -= 1;
+        case GLUT_KEY_PAGE_DOWN:
+            yAux -= 1;
             break;*/
 
 		default:
