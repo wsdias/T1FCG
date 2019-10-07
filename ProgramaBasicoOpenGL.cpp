@@ -58,11 +58,9 @@ typedef struct{
     float x, y;
 } Instancia;
 
-bool podeMover = false;
+float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0, caindo = -1;
 int larguraLogica = 192, alturaLogica = 108, segurando = -1, numObjetos = 0;
-float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
-float yN4SRO = 0, yN4SRU = 1;
-float caindo = -1;
+bool podeMover = false;
 
 vector< vector< vector<float> > > cores; // [objeto][cor][componente]
 vector< vector< vector<int> > > objetos; // [objeto][x][y]
@@ -253,11 +251,11 @@ void DesenhaCaixas()
         if (i != segurando)
         {
             glPushMatrix();
-                while (j!=20)
+                /*while (j!=20)
                 {
                     glTranslatef(0, -0.5, 0);
                     j++;
-                }
+                }*/
                 glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
                 a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
                 DesenhaObjeto(i, 0.0, 0.0);
@@ -279,11 +277,11 @@ void DesenhaNivel4Robo()
 
     glPushMatrix();
 
-        glTranslatef(0.0, objetos[6].size() - yN4SRU, 0.0); // Posiciona verticalmente em relação ao objeto anterior
+        glTranslatef(0.0, objetos[6].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
         glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
         a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
         cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0};
-        DesenhaObjeto(7, objetos[7][0].size()/2.0, yN4SRO); // Cria instância com parametros desejados (posição no SRO)
+        DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
         glTranslated((-1) * (objetos[7][0].size()/2.0),0,0);
 
         CalculaPonto(a, b);
@@ -425,6 +423,46 @@ void DesenhaContornos()
 
 // -------------------------------------------------- //
 
+bool VerificaLibreEmCima(int caixa)
+{
+    Ponto a, b, c, d, e, f, g, h;
+    float largCaixa, altCaixa, larg, alt;
+    int i;
+
+    largCaixa = objetos[caixa][0].size()/2.0;
+    altCaixa = objetos[caixa].size()/2.0;
+
+    e = f = g = h = cUniverso[caixa];
+    e.x -= largCaixa; e.y -= altCaixa;
+    f.x -= largCaixa; f.y += altCaixa;
+    g.x += largCaixa; g.y += altCaixa;
+    h.x += largCaixa; h.y -= altCaixa;
+
+    for (i = 14; i < numObjetos; i++)
+    {
+        if (i != caixa)
+        {
+            larg = objetos[i][0].size()/2.0;
+            alt = objetos[i].size()/2.0;
+
+            a = b = c = d = cUniverso[i];
+            a.x -= larg; a.y -= alt;
+            b.x -= larg; b.y += alt;
+            c.x += larg; c.y += alt;
+            d.x += larg; d.y -= alt;
+
+            if (((f.x >= a.x && f.x <= d.x) || (g.x >= a.x && g.x <= d.x)) && (f.y <= a.y))
+            {
+                cout << "# " << i << " está em cima de " << caixa << endl;
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// -------------------------------------------------- //
+
 bool VerificarSePodePegar()
 {
     float dist;
@@ -435,8 +473,11 @@ bool VerificarSePodePegar()
         dist = sqrt(pow((pb[7].x - pb[i].x), 2) + pow((pb[7].y - pb[i].y), 2));
         if (dist < pa[i].x + 1)
         {
-            segurando = i;
-            return true;
+            if (VerificaLibreEmCima(i))
+            {
+                segurando = i;
+                return true;
+            }
         }
     }
     return false;
@@ -446,10 +487,10 @@ bool VerificarSePodePegar()
 
 void SoltaCaixa()
 {
-    caindo = segurando;
+    //caindo = segurando;
     segurando = -1;
 
-    Ponto a, b, c, d;
+    /*Ponto a, b, c, d;
     Ponto e, f, g, h;
     int k = 15;
     e = f = g = h = cUniverso[k];
@@ -471,7 +512,7 @@ void SoltaCaixa()
         cUniverso[15].y -= 100;
 
         if (((e.x >= a.x && e.x <= d.x) || (h.x >= a.x && h.x <= d.x)) && (e.y < b.y)) cout << "# Colide!";
-    }
+    }*/
 }
 
 // -------------------------------------------------- //
@@ -548,7 +589,7 @@ void DefinirPropriedades()
 
     // Caixas
     deslocamento[14].x = 50; deslocamento[14].y = objetos[0].size();
-    deslocamento[15].x = 50; deslocamento[15].y = objetos[0].size() + objetos[14].size() + 50;
+    deslocamento[15].x = 50; deslocamento[15].y = objetos[0].size() + objetos[14].size();
     //deslocamento[16].x = 60; deslocamento[16].y = objetos[0].size();
     //deslocamento[17].x = (larguraLogica/2.0) + 30; deslocamento[17].y = objetos[0].size();
     //deslocamento[18].x = (larguraLogica/2.0) + 40; deslocamento[18].y = objetos[0].size();
