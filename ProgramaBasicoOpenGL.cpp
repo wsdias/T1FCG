@@ -473,7 +473,7 @@ bool VerificaLivreEmCima(int caixa)
 bool VerificaLivreEmbaixo(int caixa)
 {
     Ponto a, b, c, d, e, f, g, h;
-    float largCaixa, altCaixa, larg, alt;
+    float largCaixa, altCaixa, larg, alt, diff;
     int i;
 
     largCaixa = objetos[caixa][0].size()/2.0;
@@ -498,13 +498,23 @@ bool VerificaLivreEmbaixo(int caixa)
             c.x += larg; c.y += alt;
             d.x += larg; d.y -= alt;
 
+            if ((e.x >= a.x && f.x <= d.x) || (h.x >= a.x && h.x <= d.x))
+            {
+                diff = e.y - b.y;
+                if (e.y < b.y && diff > -0.5)
+                {
+                    cout << "# " << i << " está embaixo de " << caixa << endl;
+                    cout << "diff: " << diff << endl;
+                    return false;
+                }
+            }
 
-            if (((e.x >= a.x && f.x <= d.x) || (h.x >= a.x && h.x <= d.x)) && (e.y < b.y))
+            /*if (((e.x >= a.x && f.x <= d.x) || (h.x >= a.x && h.x <= d.x)) && (e.y < b.y))
             {
                 cout << "# " << i << " está embaixo de " << caixa << endl;
                 cout << "diff: " << e.y - b.y << endl;
                 return false;
-            }
+            }*/
         }
     }
     return true;
@@ -550,7 +560,6 @@ bool VerificaLateraisRobo(float x, float y, int direcao)
 
     for (i = 14; i < numObjetos; i++)
     {
-
         larg = objetos[i][0].size()/2.0;
         alt = objetos[i].size()/2.0;
         a = b = c = d = cUniverso[i];
@@ -561,16 +570,13 @@ bool VerificaLateraisRobo(float x, float y, int direcao)
 
         diff = d.x - (e.x - 0.5);
         if ((diff >= -1 && diff <= 1) && direcao == -1) return false;
-        cout << "@: " << diff << endl;
-
+        //cout << "#: " << diff << endl;
         diff = (h.x - 0.5) - a.x;
         if ((diff >= -1 && diff <= 1) && direcao == 1) return false;
-
         //cout << "@: " << diff << endl;
-
-        cout << i << ": " << e.x << " , " << d.x << " , " << h.x << " , " << a.x << endl;
+        //cout << i << ": " << e.x << " , " << d.x << " , " << h.x << " , " << a.x << endl;
     }
-    cout << endl;
+    //cout << endl;
     return true;
 }
 
