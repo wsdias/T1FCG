@@ -58,8 +58,8 @@ typedef struct{
     float x, y;
 } Instancia;
 
-float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0, caixaCaindo = -1;
-int larguraLogica = 192, alturaLogica = 108, segurando = -1, numObjetos = 0;
+float baseDx = 0, baseDy = 0, rotacaoN2 = 0, rotacaoN3 = 0, rotacaoN4 = 0;
+int larguraLogica = 192, alturaLogica = 108, numObjetos = 0, segurando = -1, estavaSegurando = -1;
 bool podeMover = false;
 
 vector< vector< vector<float> > > cores; // [objeto][cor][componente]
@@ -246,7 +246,11 @@ void DesenhaCaixas()
     Ponto a, b;
     int i;
 
-    if (VerificaLivreEmbaixo(15)) deslocamento[15].y -= 0.1;
+    if (estavaSegurando != -1)
+    {
+        if (VerificaLivreEmbaixo(estavaSegurando)) deslocamento[estavaSegurando].y -= 0.1;
+        else estavaSegurando = -1;
+    }
 
     for (i = 14; i < numObjetos; i++)
     {
@@ -476,9 +480,9 @@ bool VerificaLivreEmbaixo(int caixa)
     g.x += largCaixa; g.y += altCaixa;
     h.x += largCaixa; h.y -= altCaixa;
 
-    for (i = 14; i < numObjetos; i++)
+    for (i = 0; i < numObjetos; i++)
     {
-        if (i != caixa)
+        if (i != caixa && (i < 3 || i > 7))
         {
             larg = objetos[i][0].size()/2.0;
             alt = objetos[i].size()/2.0;
@@ -682,7 +686,11 @@ void keyboard ( unsigned char key, int x, int y )
 
         case ' ':
             podeMover = !podeMover;
-            if (!podeMover && segurando != -1) segurando = -1;
+            if (!podeMover && segurando != -1)
+            {
+                estavaSegurando = segurando;
+                segurando = -1;
+            }
             podeMover = VerificarSePodePegar();
             break;
 
