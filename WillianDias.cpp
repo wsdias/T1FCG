@@ -72,6 +72,7 @@ bool VerificaLivreEmbaixo(int caixa);
 bool VerificaLivreEmCima(int caixa);
 bool VerificaLateraisRobo(float x, float y, int direcao);
 
+
 void CalculaPonto(Ponto p, Ponto &out) {
 
     GLfloat ponto_novo[4];
@@ -91,14 +92,6 @@ void CalculaPonto(Ponto p, Ponto &out) {
     out.z = ponto_novo[2];
 }
 
-int intersec2d(Ponto k, Ponto l, Ponto m, Ponto n)
-{
-    double det;
-
-    det = (n.x - m.x) * (l.y - k.y)  -  (n.y - m.y) * (l.x - k.x);
-    if (det == 0.0) return 0 ; // não há intersecção
-    else return 1; // há intersecção
-}
 
 // **********************************************************************
 //  void animate ( unsigned char key, int x, int y )
@@ -262,22 +255,13 @@ void DesenhaCaixas()
             glPushMatrix();
                 glTranslatef(deslocamento[i].x, deslocamento[i].y, 0.0);
                 a = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
-
                 DesenhaObjeto(i, 0.0, 0.0);
+
                 CalculaPonto(a, b);
                 pa[i] = a;
                 pb[i] = b;
                 cLocal[i] = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
                 CalculaPonto(cLocal[i], cUniverso[i]);
-
-                if (i == 15)
-                {
-                    cout << "DA(" << deslocamento[i].x << ", " << deslocamento[i].y << ")" << endl;
-                    cout << "UA(" << cUniverso[i].x << ", " << cUniverso[i].y << ")" << endl;
-                    cout << "DB(" << deslocamento[7].x << ", " << deslocamento[7].y << ")" << endl;
-                    cout << "UB(" << pb[7].x << ", " << pb[7].y << ")" << endl;
-                }
-
             glPopMatrix();
         }
     }
@@ -290,15 +274,16 @@ void DesenhaNivel4Robo()
     Ponto a, b, t;
 
     glPushMatrix();
-
         glTranslatef(0.0, objetos[6].size() - 1.0, 0.0); // Posiciona verticalmente em relação ao objeto anterior
-        glRotatef(rotacaoN4, 0.0, 0.0, 1.0);
-        a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
-        cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0};
+        glRotatef(rotacaoN4, 0.0, 0.0, 1.0); // Rotaciona Nível 4
+
+        a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0}; // Pega ponto extremo superior
+        cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0}; // Centro em relação ao SRO
         DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
         glTranslated((-1) * (objetos[7][0].size()/2.0), 0.0, 0.0);
+
         CalculaPonto(a, b);
-        CalculaPonto(cLocal[7], cUniverso[7]);
+        CalculaPonto(cLocal[7], cUniverso[7]); // Centro em relação ao SRU
         pa[7] = a;
         pb[7] = b;
 
@@ -308,30 +293,13 @@ void DesenhaNivel4Robo()
             CalculaPonto(a, t);
             glTranslatef(0.0, -(objetos[segurando].size()/2.0), 0.0);
 
-            //cLocal[segurando] = a;
-
-            //deslocamento[segurando].x = b.x;
-            //deslocamento[segurando].y = b.y;
-
-
-                deslocamento[segurando].x = t.x - 4.5;
-                deslocamento[segurando].y = t.y;
-
-
+            deslocamento[segurando].x = t.x - (objetos[segurando].size()/2.0);
+            deslocamento[segurando].y = t.y;
             cUniverso[segurando].x = t.x;
             cUniverso[segurando].y = t.y;
 
             DesenhaObjeto(segurando, a.x, a.y);
-
-            if (segurando == 15)
-            {
-                cout << "DA(" << deslocamento[segurando].x << ", " << deslocamento[segurando].y << ")" << endl;
-                cout << "UA(" << cUniverso[segurando].x << ", " << cUniverso[segurando].y << ")" << endl;
-                cout << "DB(" << deslocamento[7].x << ", " << deslocamento[7].y << ")" << endl;
-                cout << "UB(" << pb[7].x << ", " << pb[7].y << ")" << endl;
-            }
         }
-
     glPopMatrix();
 }
 
