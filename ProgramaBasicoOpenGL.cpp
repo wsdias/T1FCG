@@ -272,8 +272,10 @@ void DesenhaCaixas()
 
                 if (i == 15)
                 {
-                    //cout << "A(" << deslocamento[i].x << ", " << deslocamento[i].y << ")" << endl;
-                    cout << "A(" << cUniverso[i].x << ", " << cUniverso[i].y << ")" << endl;
+                    cout << "DA(" << deslocamento[i].x << ", " << deslocamento[i].y << ")" << endl;
+                    cout << "UA(" << cUniverso[i].x << ", " << cUniverso[i].y << ")" << endl;
+                    cout << "DB(" << deslocamento[7].x << ", " << deslocamento[7].y << ")" << endl;
+                    cout << "UB(" << pb[7].x << ", " << pb[7].y << ")" << endl;
                 }
 
             glPopMatrix();
@@ -304,13 +306,17 @@ void DesenhaNivel4Robo()
         {
             glTranslatef(0.0, objetos[segurando].size()/2.0, 0.0);
             CalculaPonto(a, t);
+            glTranslatef(0.0, -(objetos[segurando].size()/2.0), 0.0);
 
-            cLocal[segurando] = a;
-            deslocamento[segurando].x = b.x;
-            deslocamento[segurando].y = b.y;
+            //cLocal[segurando] = a;
 
-            //cUniverso[segurando].x = deslocamento[segurando].x;
-            //cUniverso[segurando].y = deslocamento[segurando].y;
+            //deslocamento[segurando].x = b.x;
+            //deslocamento[segurando].y = b.y;
+
+
+                deslocamento[segurando].x = t.x - 4.5;
+                deslocamento[segurando].y = t.y;
+
 
             cUniverso[segurando].x = t.x;
             cUniverso[segurando].y = t.y;
@@ -319,8 +325,10 @@ void DesenhaNivel4Robo()
 
             if (segurando == 15)
             {
-                //cout << "A(" << deslocamento[segurando].x << ", " << deslocamento[segurando].y << ")" << endl;
-                cout << "A(" << cUniverso[segurando].x << ", " << cUniverso[segurando].y << ")" << endl;
+                cout << "DA(" << deslocamento[segurando].x << ", " << deslocamento[segurando].y << ")" << endl;
+                cout << "UA(" << cUniverso[segurando].x << ", " << cUniverso[segurando].y << ")" << endl;
+                cout << "DB(" << deslocamento[7].x << ", " << deslocamento[7].y << ")" << endl;
+                cout << "UB(" << pb[7].x << ", " << pb[7].y << ")" << endl;
             }
         }
 
@@ -711,7 +719,8 @@ void display( void )
         glVertex2d(pb[7].x, pb[7].y);
     glEnd();*/
 
-    DesenhaContornos();
+    // Debug das coordenadas no SRU (sem rotação)
+    //DesenhaContornos();
 
 	glutSwapBuffers();
 }
