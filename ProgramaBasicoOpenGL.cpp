@@ -432,7 +432,7 @@ void DesenhaContornos()
 bool VerificaLivreEmCima(int caixa)
 {
     Ponto a, b, c, d, e, f, g, h;
-    float largCaixa, altCaixa, larg, alt;
+    float largCaixa, altCaixa, larg, alt, diff;
     int i;
 
     largCaixa = objetos[caixa][0].size()/2.0;
@@ -457,11 +457,15 @@ bool VerificaLivreEmCima(int caixa)
             c.x += larg; c.y += alt;
             d.x += larg; d.y -= alt;
 
-            //if (((f.x >= a.x && f.x <= d.x) || (g.x >= a.x && g.x <= d.x)) && (f.y <= a.y))
-            if (((f.x >= a.x && f.x <= d.x) || (g.x >= a.x && g.x <= d.x)) && (f.y <= a.y && (f.y - a.y == 0)))
+            if ((f.x >= a.x && f.x <= d.x) || (g.x >= a.x && g.x <= d.x))
             {
-                cout << "# " << i << " está em cima de " << caixa << endl;
-                return false;
+                diff = f.y - a.y;
+                cout << "diff: " << diff << endl;
+                if (f.y >= a.y && (diff < 0.5))
+                {
+                    cout << "# " << i << " está em cima de " << caixa << endl;
+                    return false;
+                }
             }
         }
     }
@@ -508,13 +512,6 @@ bool VerificaLivreEmbaixo(int caixa)
                     return false;
                 }
             }
-
-            /*if (((e.x >= a.x && f.x <= d.x) || (h.x >= a.x && h.x <= d.x)) && (e.y < b.y))
-            {
-                cout << "# " << i << " está embaixo de " << caixa << endl;
-                cout << "diff: " << e.y - b.y << endl;
-                return false;
-            }*/
         }
     }
     return true;
