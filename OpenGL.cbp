@@ -78,7 +78,7 @@
 			<Add option="-Wno-narrowing" />
 			<Add option="-Wno-deprecated-declarations" />
 		</Compiler>
-		<Unit filename="ProgramaBasicoOpenGL.cpp" />
+		<Unit filename="WillianDias.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

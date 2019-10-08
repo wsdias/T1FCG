@@ -219,3 +219,17 @@
 
 1570372609 /home/willian/Desktop/T1FCG/GL/freeglut_ext.h
 
+1570512369 source:/home/willian/Desktop/T1FCG/WillianDias.cpp
+	<iostream>
+	<fstream>
+	<string>
+	<cmath>
+	<ctime>
+	<vector>
+	<math.h>
+	<windows.h>
+	<glut.h>
+	<sys/time.h>
+	<GLUT/glut.h>
+	<glut.h>
+
