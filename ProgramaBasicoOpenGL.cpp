@@ -67,9 +67,10 @@ vector< vector< vector<int> > > objetos; // [objeto][x][y]
 vector<Instancia> deslocamento; // [objetos]
 vector<Ponto> pa, pb, cLocal, cUniverso; // [objeto]
 
-// Funções
+// Algumas assinaturas
 bool VerificaLivreEmbaixo(int caixa);
 bool VerificaLivreEmCima(int caixa);
+bool VerificaLateraisRobo(float x, float y, int direcao);
 
 void CalculaPonto(Ponto p, Ponto &out) {
 
@@ -251,7 +252,7 @@ void DesenhaCaixas()
     if (estavaSegurando != -1)
     {
         //cout << VerificaLivreEmCima(estavaSegurando) << endl;
-        if (VerificaLivreEmbaixo(estavaSegurando)) deslocamento[estavaSegurando].y -= 0.1;
+        if (VerificaLivreEmbaixo(estavaSegurando)) deslocamento[estavaSegurando].y -= 0.5;
         else estavaSegurando = -1;
     }
 
@@ -353,11 +354,11 @@ void DesenhaNivel1Robo()
 void DesenhaRobo()
 {
     glPushMatrix();
-        glTranslatef(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy, 0.0); // Posicina e movimenta em relação universo
-        DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0);
-        DesenhaNivel1Robo();
-        cLocal[3] = {0.0, objetos[3].size()/2.0, 0.0};
-        CalculaPonto(cLocal[3], cUniverso[3]);
+        glTranslatef(deslocamento[3].x + baseDx, deslocamento[3].y + baseDy, 0.0);
+        DesenhaObjeto(3, objetos[3][0].size()/2.0, 0.0); // Desenha centralizado em relação ao SRO
+        DesenhaNivel1Robo(); // Desenha ṕróximo nível
+        cLocal[3] = {0.0, objetos[3].size()/2.0, 0.0}; // Pega centro da base
+        CalculaPonto(cLocal[3], cUniverso[3]); // Cálcula coordenadas do SRU
     glPopMatrix();
 }
 
@@ -497,6 +498,7 @@ bool VerificaLivreEmbaixo(int caixa)
             c.x += larg; c.y += alt;
             d.x += larg; d.y -= alt;
 
+
             if (((e.x >= a.x && f.x <= d.x) || (h.x >= a.x && h.x <= d.x)) && (e.y < b.y))
             {
                 cout << "# " << i << " está embaixo de " << caixa << endl;
@@ -532,6 +534,48 @@ bool VerificarSePodePegar()
 
 // -------------------------------------------------- //
 
+bool VerificaLateraisRobo(float x, float y, int direcao)
+{
+    Ponto a, b, c, d, e, f, g, h;
+    float largBase, altBase, larg, alt, diff;
+    int i;
+
+    largBase = objetos[3][0].size()/2.0;
+    altBase = objetos[3].size()/2.0;
+    e = f = g = h = cUniverso[3];
+    e.x -= largBase; e.y -= altBase;
+    f.x -= largBase; f.y += altBase;
+    g.x += largBase; g.y += altBase;
+    h.x += largBase; h.y -= altBase;
+
+    for (i = 14; i < numObjetos; i++)
+    {
+
+        larg = objetos[i][0].size()/2.0;
+        alt = objetos[i].size()/2.0;
+        a = b = c = d = cUniverso[i];
+        a.x -= larg; a.y -= alt;
+        b.x -= larg; b.y += alt;
+        c.x += larg; c.y += alt;
+        d.x += larg; d.y -= alt;
+
+        diff = d.x - (e.x - 0.5);
+        if ((diff >= -1 && diff <= 1) && direcao == -1) return false;
+        cout << "@: " << diff << endl;
+
+        diff = (h.x - 0.5) - a.x;
+        if ((diff >= -1 && diff <= 1) && direcao == 1) return false;
+
+        //cout << "@: " << diff << endl;
+
+        cout << i << ": " << e.x << " , " << d.x << " , " << h.x << " , " << a.x << endl;
+    }
+    cout << endl;
+    return true;
+}
+
+// -------------------------------------------------- //
+
 void CarregaCenario()
 {
     int i;
@@ -558,10 +602,10 @@ void CarregaCenario()
 
     // Caixas
     CarregaObjeto("gameObjects/caixaAmarela.txt", 14);
-    CarregaObjeto("gameObjects/caixaAmarela.txt", 15);
+    CarregaObjeto("gameObjects/caixaVerde.txt", 15);
     CarregaObjeto("gameObjects/caixaAmarela.txt", 16);
     CarregaObjeto("gameObjects/caixaVerde.txt", 17);
-    CarregaObjeto("gameObjects/caixaVerde.txt", 18);
+    CarregaObjeto("gameObjects/caixaAmarela.txt", 18);
     CarregaObjeto("gameObjects/caixaVerde.txt", 19);
 
     numObjetos = 20;
@@ -605,10 +649,10 @@ void DefinirPropriedades()
     // Caixas
     deslocamento[14].x = 50; deslocamento[14].y = objetos[0].size();
     deslocamento[15].x = 50; deslocamento[15].y = objetos[0].size() + objetos[14].size();
-    //deslocamento[16].x = 60; deslocamento[16].y = objetos[0].size();
-    //deslocamento[17].x = (larguraLogica/2.0) + 30; deslocamento[17].y = objetos[0].size();
-    //deslocamento[18].x = (larguraLogica/2.0) + 40; deslocamento[18].y = objetos[0].size();
-    //deslocamento[19].x = (larguraLogica/2.0) + 40; deslocamento[19].y = objetos[0].size() + objetos[18].size();
+    deslocamento[16].x = 60; deslocamento[16].y = objetos[0].size();
+    deslocamento[17].x = (larguraLogica/2.0) + 30; deslocamento[17].y = objetos[0].size();
+    deslocamento[18].x = (larguraLogica/2.0) + 40; deslocamento[18].y = objetos[0].size();
+    deslocamento[19].x = (larguraLogica/2.0) + 40; deslocamento[19].y = objetos[0].size() + objetos[18].size();
 }
 
 
@@ -712,6 +756,11 @@ void keyboard ( unsigned char key, int x, int y )
 // **********************************************************************
 void arrow_keys ( int a_keys, int x, int y )
 {
+    float dx, dy;
+
+    dx = deslocamento[3].x + baseDx;
+    dy = deslocamento[3].y;
+
 	switch ( a_keys )
 	{
 		case GLUT_KEY_UP:       // Se pressionar UP
@@ -724,20 +773,14 @@ void arrow_keys ( int a_keys, int x, int y )
 			break;
 
         case GLUT_KEY_LEFT:
-            baseDx -= 2;
+            if (VerificaLateraisRobo(dx - 2, dy, -1))
+                baseDx -= 2;
             break;
 
         case GLUT_KEY_RIGHT:
-            baseDx += 2;
+            if (VerificaLateraisRobo(dx + 2, dy, 1))
+                baseDx += 2;
             break;
-
-        /*case GLUT_KEY_PAGE_UP:
-            yAux += 1;
-            break;
-
-        case GLUT_KEY_PAGE_DOWN:
-            yAux -= 1;
-            break;*/
 
 		default:
 			break;
