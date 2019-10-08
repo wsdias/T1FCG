@@ -67,7 +67,9 @@ vector< vector< vector<int> > > objetos; // [objeto][x][y]
 vector<Instancia> deslocamento; // [objetos]
 vector<Ponto> pa, pb, cLocal, cUniverso; // [objeto]
 
+// Funções
 bool VerificaLivreEmbaixo(int caixa);
+bool VerificaLivreEmCima(int caixa);
 
 void CalculaPonto(Ponto p, Ponto &out) {
 
@@ -248,6 +250,7 @@ void DesenhaCaixas()
 
     if (estavaSegurando != -1)
     {
+        //cout << VerificaLivreEmCima(estavaSegurando) << endl;
         if (VerificaLivreEmbaixo(estavaSegurando)) deslocamento[estavaSegurando].y -= 0.1;
         else estavaSegurando = -1;
     }
@@ -453,7 +456,8 @@ bool VerificaLivreEmCima(int caixa)
             c.x += larg; c.y += alt;
             d.x += larg; d.y -= alt;
 
-            if (((f.x >= a.x && f.x <= d.x) || (g.x >= a.x && g.x <= d.x)) && (f.y <= a.y))
+            //if (((f.x >= a.x && f.x <= d.x) || (g.x >= a.x && g.x <= d.x)) && (f.y <= a.y))
+            if (((f.x >= a.x && f.x <= d.x) || (g.x >= a.x && g.x <= d.x)) && (f.y <= a.y && (f.y - a.y == 0)))
             {
                 cout << "# " << i << " está em cima de " << caixa << endl;
                 return false;
@@ -495,7 +499,8 @@ bool VerificaLivreEmbaixo(int caixa)
 
             if (((e.x >= a.x && f.x <= d.x) || (h.x >= a.x && h.x <= d.x)) && (e.y < b.y))
             {
-                cout << "# " << caixa << " está embaixo de " << i << endl;
+                cout << "# " << i << " está embaixo de " << caixa << endl;
+                cout << "diff: " << e.y - b.y << endl;
                 return false;
             }
         }
