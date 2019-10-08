@@ -251,7 +251,6 @@ void DesenhaCaixas()
 
     if (estavaSegurando != -1)
     {
-        //cout << VerificaLivreEmCima(estavaSegurando) << endl;
         if (VerificaLivreEmbaixo(estavaSegurando)) deslocamento[estavaSegurando].y -= 0.5;
         else estavaSegurando = -1;
     }
@@ -270,6 +269,13 @@ void DesenhaCaixas()
                 pb[i] = b;
                 cLocal[i] = {(objetos[i][0].size()/2.0), objetos[i].size()/2.0, 0.0};
                 CalculaPonto(cLocal[i], cUniverso[i]);
+
+                if (i == 15)
+                {
+                    //cout << "A(" << deslocamento[i].x << ", " << deslocamento[i].y << ")" << endl;
+                    cout << "A(" << cUniverso[i].x << ", " << cUniverso[i].y << ")" << endl;
+                }
+
             glPopMatrix();
         }
     }
@@ -279,7 +285,7 @@ void DesenhaCaixas()
 
 void DesenhaNivel4Robo()
 {
-    Ponto a, b;
+    Ponto a, b, t;
 
     glPushMatrix();
 
@@ -288,8 +294,7 @@ void DesenhaNivel4Robo()
         a = {(objetos[7][0].size()/2.0), objetos[7].size(), 0.0};
         cLocal[7] = {(objetos[7][0].size()/2.0), objetos[7].size()/2.0, 0.0};
         DesenhaObjeto(7, objetos[7][0].size()/2.0, 0.0); // Cria instância com parametros desejados (posição no SRO)
-        glTranslated((-1) * (objetos[7][0].size()/2.0),0,0);
-
+        glTranslated((-1) * (objetos[7][0].size()/2.0), 0.0, 0.0);
         CalculaPonto(a, b);
         CalculaPonto(cLocal[7], cUniverso[7]);
         pa[7] = a;
@@ -297,12 +302,26 @@ void DesenhaNivel4Robo()
 
         if (segurando != -1)
         {
+            glTranslatef(0.0, objetos[segurando].size()/2.0, 0.0);
+            CalculaPonto(a, t);
+
             cLocal[segurando] = a;
             deslocamento[segurando].x = b.x;
             deslocamento[segurando].y = b.y;
-            cUniverso[segurando].x = deslocamento[segurando].x;
-            cUniverso[segurando].y = deslocamento[segurando].y;
+
+            //cUniverso[segurando].x = deslocamento[segurando].x;
+            //cUniverso[segurando].y = deslocamento[segurando].y;
+
+            cUniverso[segurando].x = t.x;
+            cUniverso[segurando].y = t.y;
+
             DesenhaObjeto(segurando, a.x, a.y);
+
+            if (segurando == 15)
+            {
+                //cout << "A(" << deslocamento[segurando].x << ", " << deslocamento[segurando].y << ")" << endl;
+                cout << "A(" << cUniverso[segurando].x << ", " << cUniverso[segurando].y << ")" << endl;
+            }
         }
 
     glPopMatrix();
@@ -460,10 +479,10 @@ bool VerificaLivreEmCima(int caixa)
             if ((f.x >= a.x && f.x <= d.x) || (g.x >= a.x && g.x <= d.x))
             {
                 diff = f.y - a.y;
-                cout << "diff: " << diff << endl;
                 if (f.y >= a.y && (diff < 0.5))
                 {
-                    cout << "# " << i << " está em cima de " << caixa << endl;
+                    //cout << "# " << i << " está em cima de " << caixa << endl;
+                    //cout << "diff: " << diff << endl;
                     return false;
                 }
             }
@@ -507,8 +526,8 @@ bool VerificaLivreEmbaixo(int caixa)
                 diff = e.y - b.y;
                 if (e.y < b.y && diff > -0.5)
                 {
-                    cout << "# " << i << " está embaixo de " << caixa << endl;
-                    cout << "diff: " << diff << endl;
+                    //cout << "# " << i << " está embaixo de " << caixa << endl;
+                    //cout << "diff: " << diff << endl;
                     return false;
                 }
             }
@@ -692,7 +711,7 @@ void display( void )
         glVertex2d(pb[7].x, pb[7].y);
     glEnd();*/
 
-    //DesenhaContornos();
+    DesenhaContornos();
 
 	glutSwapBuffers();
 }
