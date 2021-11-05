@@ -26,7 +26,7 @@ Baseado no projeto inicial fornecido pelo Prof. Márcio Sarroglia Pinho.
     - freeglut3-dev
     - libjpeg-dev
 
-Observação: fazer *rebuild* do projeto conforme plataforma onde o mesmo for executado (*Debug-Linux* ou *Debug-Windows*).
+Observação: faça *rebuild* do projeto conforme plataforma onde o mesmo for executado (*Debug-Linux* ou *Debug-Windows*).
 
 ## Licença
 
