@@ -11,6 +11,8 @@ Jogo 2D onde se controla um robô capaz de movimentar caixas pelo cenário (segu
 
 Baseado no projeto inicial fornecido pelo Prof. Márcio Sarroglia Pinho.
 
+<br/>
+
 ![](images/robotgame.png)
 
 ## Requisitos
@@ -23,6 +25,8 @@ Baseado no projeto inicial fornecido pelo Prof. Márcio Sarroglia Pinho.
   - Debian/Ubuntu (Pacotes):
     - freeglut3-dev
     - libjpeg-dev
+
+Observação: fazer *rebuild* do projeto conforme plataforma onde o mesmo for executado (*Debug-Linux* ou *Debug-Windows*).
 
 ## Licença
 
