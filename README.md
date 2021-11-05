@@ -11,6 +11,8 @@ Jogo 2D onde se controla um robô capaz de movimentar caixas pelo cenário (segu
 
 Baseado no projeto inicial fornecido pelo Prof. Márcio Sarroglia Pinho.
 
+![](images/robotgame.png)
+
 ## Requisitos
 
 - [Code::Blocks](https://www.codeblocks.org/)
