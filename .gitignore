@@ -1,1 +1,4 @@
-/gameObjects/*~
+bin/
+obj/
+*.exe
+*.o
